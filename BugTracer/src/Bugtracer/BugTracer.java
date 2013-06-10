@@ -29,38 +29,39 @@ public class BugTracer {
 	private Statement stmt;
 
 	// db connection values
-	private String dbURL = "jdbc:jtds:sqlserver://127.0.0.1/BugTracer";
+	private String dbURL = "127.0.0.1/BugTracer";
 	private String dbUsr = "Gui";
 	private String dbPwd = "guipasswort";
 	private boolean connected;
 	private Gui gui;
 
 	public BugTracer() {
-		gui= new Gui(this);
-		if (connect(dbUsr,dbPwd) != null) {
+		gui = new Gui(this);
+		if (connect() != null) {
 			disconnect();
 			System.out.println("connection avaiable");
 		}
 	}
 
-	public Statement connect(String dbUsr,String dbPwd) {
-		return connect(dbUsr,dbPwd, dbURL);
+	private Statement connect() {
+		return connect(dbURL, dbUsr, dbPwd);
 	}
 
-	private Statement connect(String dbUsr,String dbPwd, String dbURL) {
-		System.out.println(dbURL + dbUsr + dbPwd);
+	public Statement connect(String dbURL, String dbUsr, String dbPwd) throws IllegalArgumentException{
+//		System.out.println(dbURL + dbUsr + dbPwd);
 		try {
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
 		} catch (ClassNotFoundException ce) {
 			// TODO Auto-generated catch block
-			
+
 			ce.printStackTrace();
 		}
 		try {
-			conn = DriverManager.getConnection(dbURL, dbUsr, dbPwd);
+			conn = DriverManager.getConnection(
+					"jdbc:jtds:sqlserver://" + dbURL, dbUsr, dbPwd);
 		} catch (SQLException e) {
 			System.out.println("no conection established");
-			e.printStackTrace();
+			throw new IllegalArgumentException("\nno conection established\n"+dbURL+"\n"+dbUsr+"\n"+ dbPwd);
 		}
 		try {
 			stmt = conn.createStatement();

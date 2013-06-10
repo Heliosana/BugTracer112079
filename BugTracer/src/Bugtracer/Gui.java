@@ -30,7 +30,9 @@ public class Gui implements ActionListener {
 	private JFrame frame;
 	private boolean connected = false;
 	private JPanel loginPanel;
-	private Statement stmt;
+	private Statement statement;
+	private JTextField serverNameTextfield;
+	private JTextField serverIPTextfield;
 
 	public Gui(BugTracer bugTracer) {
 		this.bugTracer = bugTracer;
@@ -42,12 +44,28 @@ public class Gui implements ActionListener {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Bugtracer");
-		frame.setBounds(0, 0, 748, 822);
+		frame.setBounds(0, 0, 1127, 822);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		loginPanel = new JPanel();
 		frame.getContentPane().add(loginPanel, BorderLayout.NORTH);
 		loginPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JLabel lblServerip = new JLabel("Server-IP:");
+		loginPanel.add(lblServerip);
+		
+		serverIPTextfield = new JTextField();
+		serverIPTextfield.setText("127.0.0.1:1433");
+		loginPanel.add(serverIPTextfield);
+		serverIPTextfield.setColumns(10);
+		
+		JLabel lblServername = new JLabel("Servername:");
+		loginPanel.add(lblServername);
+		
+		serverNameTextfield = new JTextField();
+		serverNameTextfield.setText("BugTracer");
+		serverNameTextfield.setColumns(10);
+		loginPanel.add(serverNameTextfield);
 
 		JLabel lblLoginname = new JLabel("Loginname:");
 		loginPanel.add(lblLoginname);
@@ -85,8 +103,13 @@ public class Gui implements ActionListener {
 
 	private void login() {
 		logout();
-		stmt = bugTracer.connect(loginnameTextfield.getText(),
-				pwTextfield.getText());
+		try {
+		statement = bugTracer.connect(serverIPTextfield.getText()+"/"+serverNameTextfield.getText(),loginnameTextfield.getText(),
+			pwTextfield.getText());
+		} catch (IllegalArgumentException e) {
+			new ErrorFrame(e);
+		}
+		
 	}
 
 	private void logout() {
