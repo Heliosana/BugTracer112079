@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
+import javax.swing.JPasswordField;
 import javax.swing.JTextArea;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -21,22 +22,25 @@ import javax.swing.JSeparator;
 import java.awt.CardLayout;
 import java.sql.Statement;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 
 public class Gui implements ActionListener {
 
 	private BugTracer bugTracer;
 	private JTextField loginnameTextfield;
-	private JTextField pwTextfield;
+	private JPasswordField pwField;
 	private JFrame frame;
 	private boolean connected = false;
 	private JPanel loginPanel;
 	private Statement statement;
 	private JTextField serverNameTextfield;
 	private JTextField serverIPTextfield;
+	private JLabel statepane;
 
 	public Gui(BugTracer bugTracer) {
 		this.bugTracer = bugTracer;
 		initialize();
+		setState("gui started");
 		frame.setVisible(true);
 
 	}
@@ -50,18 +54,18 @@ public class Gui implements ActionListener {
 		loginPanel = new JPanel();
 		frame.getContentPane().add(loginPanel, BorderLayout.NORTH);
 		loginPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
+
 		JLabel lblServerip = new JLabel("Server-IP:");
 		loginPanel.add(lblServerip);
-		
+
 		serverIPTextfield = new JTextField();
 		serverIPTextfield.setText("127.0.0.1:1433");
 		loginPanel.add(serverIPTextfield);
 		serverIPTextfield.setColumns(10);
-		
+
 		JLabel lblServername = new JLabel("Servername:");
 		loginPanel.add(lblServername);
-		
+
 		serverNameTextfield = new JTextField();
 		serverNameTextfield.setText("BugTracer");
 		serverNameTextfield.setColumns(10);
@@ -79,12 +83,12 @@ public class Gui implements ActionListener {
 		JLabel lblPassword = new JLabel("Password:");
 		loginPanel.add(lblPassword);
 
-		pwTextfield = new JTextField();
-		pwTextfield.setText("guipasswort");
-		loginPanel.add(pwTextfield);
-		pwTextfield.setColumns(10);
-		pwTextfield.addActionListener(this);
-		
+		pwField = new JPasswordField();
+		pwField.setText("guipasswort");
+		loginPanel.add(pwField);
+		pwField.setColumns(10);
+		pwField.addActionListener(this);
+
 		JButton btnLogin = new JButton("Login");
 		btnLogin.setHorizontalAlignment(SwingConstants.RIGHT);
 		btnLogin.addActionListener(this);
@@ -96,20 +100,27 @@ public class Gui implements ActionListener {
 
 		JPanel controlPanel = new JPanel();
 		frame.getContentPane().add(controlPanel, BorderLayout.EAST);
-		
+
 		JTabbedPane tableTabbedPanel = new JTabbedPane(JTabbedPane.TOP);
 		frame.getContentPane().add(tableTabbedPanel, BorderLayout.CENTER);
+
+		statepane = new JLabel();
+		statepane.setHorizontalAlignment(SwingConstants.LEFT);
+		statepane.setBackground(Color.black);
+		statepane.setForeground(Color.BLACK);
+		frame.getContentPane().add(statepane, BorderLayout.SOUTH);
 	}
 
 	private void login() {
 		logout();
 		try {
-		statement = bugTracer.connect(serverIPTextfield.getText()+"/"+serverNameTextfield.getText(),loginnameTextfield.getText(),
-			pwTextfield.getText());
+			statement = bugTracer.connect(serverIPTextfield.getText(),
+					serverNameTextfield.getText(),
+					loginnameTextfield.getText(), pwField.getText());
 		} catch (IllegalArgumentException e) {
 			new ErrorFrame(e);
 		}
-		
+
 	}
 
 	private void logout() {
@@ -118,11 +129,13 @@ public class Gui implements ActionListener {
 
 	public void setdisconnected() {
 		connected = false;
+		setState("disconnected");
 		loginPanel.setBackground(Color.RED);
 	}
 
 	public void setconnected() {
 		connected = true;
+		setState("connected");
 		loginPanel.setBackground(Color.GREEN);
 	}
 
@@ -132,5 +145,9 @@ public class Gui implements ActionListener {
 			logout();
 		} else
 			login();
+	}
+
+	public void setState(String state) {
+		statepane.setText("state:  " + state);
 	}
 }

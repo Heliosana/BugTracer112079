@@ -17,6 +17,7 @@ import java.awt.event.WindowEvent;
 public class ErrorFrame extends JFrame implements ActionListener {
 
 	ErrorFrame(Exception exc) {
+//		exc.printStackTrace();
 		getContentPane().setBackground(Color.RED);
 		setTitle("Error");
 		this.setBounds(0, 0, 328, 273);
@@ -36,6 +37,9 @@ public class ErrorFrame extends JFrame implements ActionListener {
 		getContentPane().add(lblHead, BorderLayout.NORTH);
 
 		JTextPane errorTextPane = new JTextPane();
+		errorTextPane.setEditable(false);
+		errorTextPane.setBackground(Color.BLACK);
+		errorTextPane.setForeground(Color.WHITE);
 		getContentPane().add(errorTextPane, BorderLayout.CENTER);
 		errorTextPane.setText(exc.toString());
 
