@@ -29,23 +29,31 @@ public class BugTracer {
 	private Statement stmt;
 
 	// db connection values
+	private String dbURL = "jdbc:jtds:sqlserver://127.0.0.1/BugTracer";
 	private String dbUsr = "Gui";
 	private String dbPwd = "guipasswort";
-	private String dbURL = "jdbc:jtds:sqlserver://127.0.0.1/BugTracer";
+	private boolean connected;
+	private Gui gui;
 
 	public BugTracer() {
-		if (connect() != null) {
+		gui= new Gui(this);
+		if (connect(dbUsr,dbPwd) != null) {
 			disconnect();
 			System.out.println("connection avaiable");
 		}
-		new Gui(this);
 	}
 
-	public Statement connect() {
+	public Statement connect(String dbUsr,String dbPwd) {
+		return connect(dbUsr,dbPwd, dbURL);
+	}
+
+	private Statement connect(String dbUsr,String dbPwd, String dbURL) {
+		System.out.println(dbURL + dbUsr + dbPwd);
 		try {
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
 		} catch (ClassNotFoundException ce) {
 			// TODO Auto-generated catch block
+			
 			ce.printStackTrace();
 		}
 		try {
@@ -56,35 +64,14 @@ public class BugTracer {
 		}
 		try {
 			stmt = conn.createStatement();
+			System.out.print("connected\t");
+			gui.setconnected();
 		} catch (SQLException e) {
 			System.out.println("can't create statement on connection");
 			e.printStackTrace();
-
 		}
-		System.out.print("connected\t");
 		return stmt;
 	}
-
-	// private ResultSet selectUserdata(Statement stmt) {
-	// ResultSet rs = stmt.executeQuery("Select * From UserData;");
-	// model.setColumnCount(0);
-	// model.setNumRows(0);
-	// newHeader("KundeID");
-	// newHeader("KuName");
-	// newHeader("Ort");
-	// newHeader("PLZ");
-	//
-	// while (rs.next()) {
-	// String[] übergabe = { rs.getString("UserdataID"),
-	// rs.getString("Nick"), rs.getString("Name"),
-	// rs.getString("Adresse"), rs.getString("Telefon") };
-	// model.addRow(übergabe);
-	// }
-	//
-	// if (rs != null)
-	// rs.close();
-	// return rs;
-	// }
 
 	public void disconnect() {
 		try {
@@ -94,6 +81,7 @@ public class BugTracer {
 			if (conn != null) {
 				conn.close();
 			}
+			gui.setdisconnected();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
