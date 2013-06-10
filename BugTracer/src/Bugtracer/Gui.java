@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Statement;
+import java.util.Enumeration;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,15 +15,34 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
+import java.awt.ScrollPane;
+
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.plaf.TableUI;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.text.TabExpander;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
-public class Gui implements ActionListener {
+public class Gui implements ActionListener, ChangeListener {
 
 	private BugTracer bugTracer;
 	private JTextField loginnameTextfield;
@@ -35,23 +55,24 @@ public class Gui implements ActionListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tableTPanel;
-	private JPanel mainTPanel;
-	private JPanel testPanel;
-	private JButton btnAdd;
-	private JButton btnTest;
+	public DefaultTableModel testModel = new DefaultTableModel();
+	private DefaultTableModel models[] = new DefaultTableModel[10];
+	private ControlPanel controlPanel;
 
 	public Gui(BugTracer bugTracer) {
 		this.bugTracer = bugTracer;
 		initialize();
 		setState("gui started");
 		frame.setVisible(true);
+		tableTPanel.setSelectedIndex(1);
+		tableTPanel.setSelectedIndex(0);
 
 	}
 
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Bugtracer");
-		frame.setBounds(0, 0, 883, 710);
+		frame.setBounds(0, 0, 1005, 710);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 1101, 10, 0 };
@@ -117,6 +138,8 @@ public class Gui implements ActionListener {
 		loginPanel.add(btnLogout);
 
 		tableTPanel = new JTabbedPane(JTabbedPane.TOP);
+		tableTPanel.addChangeListener(this);
+
 		GridBagConstraints gbc_tableTabbedPanel = new GridBagConstraints();
 		gbc_tableTabbedPanel.fill = GridBagConstraints.BOTH;
 		gbc_tableTabbedPanel.insets = new Insets(0, 0, 5, 5);
@@ -124,13 +147,10 @@ public class Gui implements ActionListener {
 		gbc_tableTabbedPanel.gridy = 1;
 		frame.getContentPane().add(tableTPanel, gbc_tableTabbedPanel);
 
-		mainTPanel = new JPanel();
-		tableTPanel.addTab("New tab", null, mainTPanel, null);
+		addTab("TestTable1");
+		addTab("TestTable2");
 
-		testPanel = new JPanel();
-		tableTPanel.addTab("New tab", null, testPanel, null);
-
-		JPanel controlPanel = new ControlPanel(this);
+		controlPanel = new ControlPanel(this, testModel);
 		controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagConstraints gbc_controlPanel = new GridBagConstraints();
 		gbc_controlPanel.gridheight = 2;
@@ -147,19 +167,6 @@ public class Gui implements ActionListener {
 		gbl_controlPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
 		controlPanel.setLayout(gbl_controlPanel);
 
-		btnAdd = new JButton("Add");
-		GridBagConstraints gbc_btnAdd = new GridBagConstraints();
-		gbc_btnAdd.insets = new Insets(0, 0, 5, 0);
-		gbc_btnAdd.gridx = 0;
-		gbc_btnAdd.gridy = 0;
-		controlPanel.add(btnAdd, gbc_btnAdd);
-
-		btnTest = new JButton("Test");
-		GridBagConstraints gbc_btnTest = new GridBagConstraints();
-		gbc_btnTest.gridx = 0;
-		gbc_btnTest.gridy = 1;
-		controlPanel.add(btnTest, gbc_btnTest);
-
 		statepane = new JLabel();
 		statepane.setHorizontalAlignment(SwingConstants.CENTER);
 		statepane.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -170,6 +177,16 @@ public class Gui implements ActionListener {
 		gbc_statepane.gridx = 0;
 		gbc_statepane.gridy = 2;
 		frame.getContentPane().add(statepane, gbc_statepane);
+	}
+
+	private synchronized void addTab(String tabName) {
+		DefaultTableModel model = new DefaultTableModel();
+		JTable table = new JTable(model);
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		JScrollPane sPane = new JScrollPane(table);
+		sPane.setName(tabName);
+		tableTPanel.addTab(tabName, null, sPane, null);
+		models[tableTPanel.getTabCount() - 1] = model;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -212,4 +229,14 @@ public class Gui implements ActionListener {
 	public void setState(String state) {
 		statepane.setText("state:  " + state + "...");
 	}
+
+	@Override
+	public void stateChanged(ChangeEvent state) {
+		String tableName= tableTPanel.getSelectedComponent().getName();
+		int i = tableTPanel.getSelectedIndex();
+		if (models[i] != null) {
+			controlPanel.setActiveModel(models[i],tableName);
+		}
+	}
+
 }
