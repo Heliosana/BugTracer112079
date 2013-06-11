@@ -186,6 +186,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 				}
 			} catch (SQLException e) {
 				try {
+					//FIXME NULL-Werte --> Fehler bei INSERT
 					rslt.moveToInsertRow();
 					rslt.updateObject(column, value);
 					rslt.insertRow();
