@@ -37,7 +37,7 @@ public class Gui implements ActionListener, ChangeListener {
 	private JFrame frame;
 	private boolean connected = false;
 	private JPanel loginPanel;
-	private Statement statement;
+	public Statement statement;
 	private JTextField serverNameTextfield;
 	private JTextField serverIPTextfield;
 	private JLabel statepane;

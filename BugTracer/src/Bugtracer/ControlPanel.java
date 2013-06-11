@@ -12,6 +12,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.table.DefaultTableModel;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
+
 import javax.swing.JLabel;
 
 public class ControlPanel extends JPanel implements ActionListener {
@@ -20,65 +24,99 @@ public class ControlPanel extends JPanel implements ActionListener {
 	private JTabbedPane tPane;
 	private DefaultTableModel tableModel;
 	private String tableName;
+	private ResultSet rs;
 
 	public ControlPanel(Gui gui, DefaultTableModel tableModel) {
 		this.gui = gui;
 		this.tableModel = tableModel;
-				GridBagLayout gridBagLayout = new GridBagLayout();
-				gridBagLayout.columnWidths = new int[] {100};
-				gridBagLayout.rowHeights = new int[] {50, 50, 50, 50, 0, 100};
-				gridBagLayout.columnWeights = new double[]{0.0};
-				gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-				setLayout(gridBagLayout);
-										
-												JButton btnAdd = new JButton("Add");
-												btnAdd.addActionListener(this);
-												GridBagConstraints gbc_btnAdd = new GridBagConstraints();
-												gbc_btnAdd.insets = new Insets(0, 0, 5, 0);
-												gbc_btnAdd.gridx = 0;
-												gbc_btnAdd.gridy = 0;
-												add(btnAdd, gbc_btnAdd);
-										
-												JButton btnTest = new JButton("Test");
-												btnTest.addActionListener(this);
-												GridBagConstraints gbc_btnTest = new GridBagConstraints();
-												gbc_btnTest.insets = new Insets(0, 0, 5, 0);
-												gbc_btnTest.gridx = 0;
-												gbc_btnTest.gridy = 1;
-												add(btnTest, gbc_btnTest);
-										
-										JButton btnLoad = new JButton("Load");
-										btnLoad.addActionListener(this);
-										GridBagConstraints gbc_btnLoad = new GridBagConstraints();
-										gbc_btnLoad.insets = new Insets(0, 0, 5, 0);
-										gbc_btnLoad.gridx = 0;
-										gbc_btnLoad.gridy = 2;
-										add(btnLoad, gbc_btnLoad);
-										
-										JButton btnSave = new JButton("Save");
-										btnSave.addActionListener(this);
-										GridBagConstraints gbc_btnSave = new GridBagConstraints();
-										gbc_btnSave.insets = new Insets(0, 0, 5, 0);
-										gbc_btnSave.gridx = 0;
-										gbc_btnSave.gridy = 3;
-										add(btnSave, gbc_btnSave);
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.columnWidths = new int[] { 100 };
+		gridBagLayout.rowHeights = new int[] { 50, 50, 50, 50, 0, 100 };
+		gridBagLayout.columnWeights = new double[] { 0.0 };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0,
+				Double.MIN_VALUE };
+		setLayout(gridBagLayout);
+
+		JButton btnAdd = new JButton("Add");
+		btnAdd.addActionListener(this);
+		GridBagConstraints gbc_btnAdd = new GridBagConstraints();
+		gbc_btnAdd.insets = new Insets(0, 0, 5, 0);
+		gbc_btnAdd.gridx = 0;
+		gbc_btnAdd.gridy = 0;
+		add(btnAdd, gbc_btnAdd);
+
+		JButton btnTest = new JButton("Test");
+		btnTest.addActionListener(this);
+		GridBagConstraints gbc_btnTest = new GridBagConstraints();
+		gbc_btnTest.insets = new Insets(0, 0, 5, 0);
+		gbc_btnTest.gridx = 0;
+		gbc_btnTest.gridy = 1;
+		add(btnTest, gbc_btnTest);
+
+		JButton btnLoad = new JButton("Load");
+		btnLoad.addActionListener(this);
+		GridBagConstraints gbc_btnLoad = new GridBagConstraints();
+		gbc_btnLoad.insets = new Insets(0, 0, 5, 0);
+		gbc_btnLoad.gridx = 0;
+		gbc_btnLoad.gridy = 2;
+		add(btnLoad, gbc_btnLoad);
+
+		JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(this);
+		GridBagConstraints gbc_btnSave = new GridBagConstraints();
+		gbc_btnSave.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSave.gridx = 0;
+		gbc_btnSave.gridy = 3;
+		add(btnSave, gbc_btnSave);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		if (event.getActionCommand() == "Test") {
-			this.tableModel.setColumnCount(5);
-			this.tableModel.setRowCount(4);
+		if (event.getActionCommand() == "Add") {
+			gui.setState("add content");
+
+		} else if (event.getActionCommand() == "Load") {
+
+		} else if (event.getActionCommand() == "Save") {
+			gui.setState("save content");
+
 		} else {
-			this.tableModel.setColumnCount(10);
-			this.tableModel.setRowCount(50);
+			gui.setState("test content");
+
 		}
 	}
+
+	private void loadSql() throws SQLException {
+		String[] headerString = new String[10];
+		try {
+			rs = gui.statement.executeQuery("SELECT * FROM " + tableName);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for (int i = 1; null != (headerString[i] = rs.getNString(i)); ++i)
+			;
+		tableModel = new DefaultTableModel(headerString, 1);
+		rebuildModel();
+	}
+
+	private void rebuildModel() {
+		String[] headerString;
+//		for (int i = 1; null != (headerString[i] = rs.getNString(i)); ++i) {
+//			tableModel.addColumn(rs.getNString(i), (Object[]) rs.getArray(i));
+		}
 
 	public void setActiveModel(DefaultTableModel tableModel, String tableName) {
 		gui.setState("switch to " + tableName);
 		this.tableModel = tableModel;
 		this.tableName = tableName;
+		try {
+			loadSql();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }
