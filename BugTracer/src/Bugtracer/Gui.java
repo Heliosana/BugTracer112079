@@ -50,11 +50,11 @@ public class Gui implements ActionListener, ChangeListener {
 	public Gui(BugTracer bugTracer) {
 		this.bugTracer = bugTracer;
 		initialize();
-		setState("gui started");
-		frame.setVisible(true);
+		setdisconnected();
 		tableTPanel.setSelectedIndex(1);
 		tableTPanel.setSelectedIndex(0);
-
+		setState("gui started");
+		frame.setVisible(true);
 	}
 
 	private void initialize() {
@@ -146,7 +146,7 @@ public class Gui implements ActionListener, ChangeListener {
 
 		controlPanel = new ControlPanel(this, testModel);
 		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel.getLayout();
-		gridBagLayout_1.columnWidths = new int[] {80};
+		gridBagLayout_1.columnWidths = new int[] {100};
 		gridBagLayout_1.rowHeights = new int[] {50, 50, 50, 50, 50};
 		controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagConstraints gbc_controlPanel = new GridBagConstraints();

@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.GridLayout;
@@ -20,7 +22,8 @@ import java.util.Vector;
 
 import javax.swing.JLabel;
 
-public class ControlPanel extends JPanel implements ActionListener {
+public class ControlPanel extends JPanel implements ActionListener,
+		TableModelListener {
 
 	private Gui gui;
 	private DefaultTableModel tableModel;
@@ -31,6 +34,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 	public ControlPanel(Gui gui, DefaultTableModel tableModel) {
 		this.gui = gui;
 		this.tableModel = tableModel;
+		initialize();
+	}
+
+	private void initialize() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 100 };
 		gridBagLayout.rowHeights = new int[] { 50, 50, 50, 50, 0, 100 };
@@ -55,13 +62,13 @@ public class ControlPanel extends JPanel implements ActionListener {
 		gbc_btnTest.gridy = 1;
 		add(btnTest, gbc_btnTest);
 
-		JButton btnLoad = new JButton("Load");
-		btnLoad.addActionListener(this);
+		JButton btnreload = new JButton("Reload");
+		btnreload.addActionListener(this);
 		GridBagConstraints gbc_btnLoad = new GridBagConstraints();
 		gbc_btnLoad.insets = new Insets(0, 0, 5, 0);
 		gbc_btnLoad.gridx = 0;
 		gbc_btnLoad.gridy = 2;
-		add(btnLoad, gbc_btnLoad);
+		add(btnreload, gbc_btnLoad);
 
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(this);
@@ -75,41 +82,45 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == "Add") {
+			// TODO
 			state("add content");
-
-		} else if (event.getActionCommand() == "Load") {
-
+		} else if (event.getActionCommand() == "Reload") {
+			state("reload content");
+			reload();
 		} else if (event.getActionCommand() == "Save") {
+			// TODO
 			state("save content");
-
 		} else {
+			test();
 			state("test content");
-
 		}
 	}
 
 	public void setActiveModel(DefaultTableModel tableModel, String tableName) {
-		if (gui.connected) {
-			state("switch to " + tableName);
-			this.tableModel = tableModel;
-			this.tableName = tableName;
-			refresh();
+		state("switch to " + tableName);
+		if (tableModel != null) {
+			this.tableModel.removeTableModelListener(this);
 		}
-
+		this.tableModel = tableModel;
+		this.tableModel.addTableModelListener(this);
+		this.tableName = tableName;
+		reload();
 	}
 
-	private void refresh() {
-		loadSql();
-		rebuildModel();
+	private void reload() {
+		if (gui.connected) {
+			loadSql();
+			rebuildModel();
+		} else
+			state("not connected to reload");
 	}
 
 	private void loadSql() {
-		state("load sql table");
+		state("load sql table from db");
 		if (rslt != null) {
 			try {
 				rslt.close();
 			} catch (SQLException e) {
-				e.fillInStackTrace();
 				e.printStackTrace();
 			}
 		}
@@ -117,14 +128,13 @@ public class ControlPanel extends JPanel implements ActionListener {
 			rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
 			rsltMetaData = rslt.getMetaData();
 		} catch (SQLException e) {
-			e.fillInStackTrace();
 			e.printStackTrace();
 		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void rebuildModel() {
-		state("refresh model");
+		state("reload model");
 		Vector columnNames = new Vector();
 		Vector data = new Vector();
 		try {
@@ -149,8 +159,17 @@ public class ControlPanel extends JPanel implements ActionListener {
 		}
 	}
 
+	private void test() {
+
+	}
+
 	private void state(String state) {
 		gui.setState(state);
+	}
+
+	@Override
+	public void tableChanged(TableModelEvent event) {
+		System.out.println(event.toString());
 	}
 
 }
