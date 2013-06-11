@@ -169,7 +169,33 @@ public class ControlPanel extends JPanel implements ActionListener,
 
 	@Override
 	public void tableChanged(TableModelEvent event) {
-		System.out.println(event.toString());
+		if (event.ALL_COLUMNS == event.getColumn()) {
+			// rebuild the model
+		} else {
+			int column = event.getColumn() + 1;
+			int frow = event.getFirstRow() + 1;
+			Object value = tableModel.getValueAt(frow - 1, column - 1);
+			try {
+				rslt.absolute(frow);
+				System.out.println(rslt.getObject(column));
+				if (value != rslt.getObject(column)) {
+					rslt.updateObject(column, value);
+					rslt.updateRow();
+					state("column " + column + " & row " + frow
+							+ " updated to " + value);
+				}
+			} catch (SQLException e) {
+				try {
+					rslt.moveToInsertRow();
+					rslt.updateObject(column, value);
+					rslt.insertRow();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			} finally {
+				reload();
+			}
+		}
 	}
-
 }
