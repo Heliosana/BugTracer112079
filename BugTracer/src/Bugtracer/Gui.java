@@ -24,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
@@ -35,7 +36,7 @@ public class Gui implements ActionListener, ChangeListener {
 	private JTextField loginnameTextfield;
 	private JPasswordField pwField;
 	private JFrame frame;
-	private boolean connected = false;
+	public boolean connected = false;
 	private JPanel loginPanel;
 	public Statement statement;
 	private JTextField serverNameTextfield;
@@ -134,8 +135,14 @@ public class Gui implements ActionListener, ChangeListener {
 		gbc_tableTabbedPanel.gridy = 1;
 		frame.getContentPane().add(tableTPanel, gbc_tableTabbedPanel);
 
-		addTab("TestTable1");
-		addTab("TestTable2");
+		addTab("Projekt");
+		addTab("Release");
+		addTab("Bug");
+		addTab("Ticket");
+		addTab("Dev");
+		addTab("Tester");
+		addTab("UserData");
+		addTab("Adresse");
 
 		controlPanel = new ControlPanel(this, testModel);
 		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel.getLayout();
@@ -163,7 +170,7 @@ public class Gui implements ActionListener, ChangeListener {
 		frame.getContentPane().add(statepane, gbc_statepane);
 	}
 
-	private synchronized void addTab(String tabName) {
+	private void addTab(String tabName) {
 		DefaultTableModel model = new DefaultTableModel();
 		JTable table = new JTable(model);
 		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

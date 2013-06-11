@@ -9,10 +9,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Vector;
 
@@ -21,10 +23,10 @@ import javax.swing.JLabel;
 public class ControlPanel extends JPanel implements ActionListener {
 
 	private Gui gui;
-	private JTabbedPane tPane;
 	private DefaultTableModel tableModel;
 	private String tableName;
-	private ResultSet rs;
+	private ResultSet rslt;
+	private ResultSetMetaData rsltMetaData;
 
 	public ControlPanel(Gui gui, DefaultTableModel tableModel) {
 		this.gui = gui;
@@ -73,50 +75,82 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == "Add") {
-			gui.setState("add content");
+			state("add content");
 
 		} else if (event.getActionCommand() == "Load") {
 
 		} else if (event.getActionCommand() == "Save") {
-			gui.setState("save content");
+			state("save content");
 
 		} else {
-			gui.setState("test content");
+			state("test content");
 
 		}
 	}
 
-	private void loadSql() throws SQLException {
-		String[] headerString = new String[10];
-		try {
-			rs = gui.statement.executeQuery("SELECT * FROM " + tableName);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public void setActiveModel(DefaultTableModel tableModel, String tableName) {
+		if (gui.connected) {
+			state("switch to " + tableName);
+			this.tableModel = tableModel;
+			this.tableName = tableName;
+			refresh();
 		}
-		for (int i = 1; null != (headerString[i] = rs.getNString(i)); ++i)
-			;
-		tableModel = new DefaultTableModel(headerString, 1);
+
+	}
+
+	private void refresh() {
+		loadSql();
 		rebuildModel();
 	}
 
-	private void rebuildModel() {
-		String[] headerString;
-//		for (int i = 1; null != (headerString[i] = rs.getNString(i)); ++i) {
-//			tableModel.addColumn(rs.getNString(i), (Object[]) rs.getArray(i));
+	private void loadSql() {
+		state("load sql table");
+		if (rslt != null) {
+			try {
+				rslt.close();
+			} catch (SQLException e) {
+				e.fillInStackTrace();
+				e.printStackTrace();
+			}
 		}
-
-	public void setActiveModel(DefaultTableModel tableModel, String tableName) {
-		gui.setState("switch to " + tableName);
-		this.tableModel = tableModel;
-		this.tableName = tableName;
 		try {
-			loadSql();
+			rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
+			rsltMetaData = rslt.getMetaData();
+		} catch (SQLException e) {
+			e.fillInStackTrace();
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void rebuildModel() {
+		state("refresh model");
+		Vector columnNames = new Vector();
+		Vector data = new Vector();
+		try {
+			int columns = rsltMetaData.getColumnCount();
+			for (int i = 1; i <= columns; i++) {
+				columnNames.addElement(rsltMetaData.getColumnName(i));
+			}
+			while (rslt.next()) {
+				Vector row = new Vector(columns);
+				for (int i = 1; i <= columns; i++) {
+					row.addElement(rslt.getObject(i));
+				}
+				data.addElement(row);
+			}
+			data.addElement(new Vector(columns));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			// System.out.println(data.toString()+columnNames.toString());
+			tableModel.setDataVector(data, columnNames);
 		}
+	}
 
+	private void state(String state) {
+		gui.setState(state);
 	}
 
 }
