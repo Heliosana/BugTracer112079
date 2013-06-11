@@ -25,6 +25,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import javax.swing.BoxLayout;
 
 public class Gui implements ActionListener, ChangeListener {
 
@@ -135,21 +138,18 @@ public class Gui implements ActionListener, ChangeListener {
 		addTab("TestTable2");
 
 		controlPanel = new ControlPanel(this, testModel);
+		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel.getLayout();
+		gridBagLayout_1.columnWidths = new int[] {80};
+		gridBagLayout_1.rowHeights = new int[] {50, 50, 50, 50, 50};
 		controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagConstraints gbc_controlPanel = new GridBagConstraints();
-		gbc_controlPanel.gridheight = 2;
-		gbc_controlPanel.anchor = GridBagConstraints.WEST;
 		gbc_controlPanel.fill = GridBagConstraints.VERTICAL;
-		gbc_controlPanel.insets = new Insets(0, 0, 5, 0);
+//		gbc_controlPanel.anchor = GridBagConstraints.NORTH;
+//		gbc_controlPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_controlPanel.gridx = 1;
 		gbc_controlPanel.gridy = 1;
 		frame.getContentPane().add(controlPanel, gbc_controlPanel);
-		GridBagLayout gbl_controlPanel = new GridBagLayout();
-		gbl_controlPanel.columnWidths = new int[] { 60, 0 };
-		gbl_controlPanel.rowHeights = new int[] { 23, 0, 0 };
-		gbl_controlPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_controlPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
-		controlPanel.setLayout(gbl_controlPanel);
+//		controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 
 		statepane = new JLabel();
 		statepane.setHorizontalAlignment(SwingConstants.CENTER);
