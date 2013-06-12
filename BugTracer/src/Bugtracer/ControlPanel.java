@@ -166,22 +166,29 @@ public class ControlPanel extends JPanel implements ActionListener,
 		if (TableModelEvent.ALL_COLUMNS == event.getColumn()) {
 			// rebuild the model
 		} else {
-			int column = event.getColumn() + 1;
-			int frow = event.getFirstRow() + 1;
-			Object value = tableModel.getValueAt(frow - 1, column - 1);
+			int column = event.getColumn();
+			int row = event.getFirstRow();
+			Object value = tableModel.getValueAt(row++, column++);
 			try {
-				rslt.absolute(frow);
+				rslt.moveToCurrentRow();
+				int actRow = rslt.getRow();
+				if (!(actRow == row)) {
+					rslt.updateRow();
+					state("update row: " + actRow + " to db");
+					rslt.absolute(row);
+				}
 				System.out.println(rslt.getObject(column));
 				if (value != rslt.getObject(column)) {
 					rslt.updateObject(column, value);
-					rslt.updateRow();
-					state("column " + column + " & row " + frow
-							+ " updated to " + value);
+					// rslt.updateRow();
+					state("update x: " + column + " - y: " + row + " to: "
+							+ value);
 				}
 			} catch (SQLException e) {
 				try {
-					//FIXME NULL-Werte --> Fehler bei INSERT
+					// FIXME NULL-Werte --> Fehler bei INSERT
 					rslt.moveToInsertRow();
+					System.out.println(rslt.getRow()); // get insert row id
 					rslt.updateObject(column, value);
 					rslt.insertRow();
 				} catch (SQLException e1) {
