@@ -39,7 +39,7 @@ public class Gui implements ActionListener, ChangeListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tableTPanel;
-	public DefaultTableModel testModel = new DefaultTableModel();
+
 	private JTable[] tables = new JTable[20];
 	private ControlPanel controlPanel;
 
@@ -51,6 +51,20 @@ public class Gui implements ActionListener, ChangeListener {
 		tableTPanel.setSelectedIndex(0);
 		setState("gui started");
 		frame.setVisible(true);
+	}
+
+	private void createTabs() {
+		addTab("Projekt");
+		addTab("Release");
+		addTab("Bug");
+		addTab("Ticket");
+		addTab("Dev");
+		addTab("Tester");
+		addTab("UserData");
+		addTab("Adresse");
+		addTab("Developer");
+		addTab("BugTester");
+		addTab("AllUser");
 	}
 
 	private void initialize() {
@@ -131,16 +145,9 @@ public class Gui implements ActionListener, ChangeListener {
 		gbc_tableTabbedPanel.gridy = 1;
 		frame.getContentPane().add(tableTPanel, gbc_tableTabbedPanel);
 
-		addTab("Projekt");
-		addTab("Release");
-		addTab("Bug");
-		addTab("Ticket");
-		addTab("Dev");
-		addTab("Tester");
-		addTab("UserData");
-		addTab("Adresse");
+		createTabs();
 
-		controlPanel = new ControlPanel(this, testModel);
+		controlPanel = new ControlPanel(this);
 		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel
 				.getLayout();
 		gridBagLayout_1.columnWidths = new int[] { 100 };
