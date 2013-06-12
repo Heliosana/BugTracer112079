@@ -27,9 +27,8 @@ public class ControlPanel extends JPanel implements ActionListener,
 	private ResultSetMetaData rsltMetaData;
 	private JTable table;
 
-	public ControlPanel(Gui gui, DefaultTableModel tableModel) {
+	public ControlPanel(Gui gui) {
 		this.gui = gui;
-		this.tableModel = tableModel;
 		initialize();
 	}
 
