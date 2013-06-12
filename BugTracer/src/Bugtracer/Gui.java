@@ -40,7 +40,8 @@ public class Gui implements ActionListener, ChangeListener {
 	private JLabel statepane;
 	private JTabbedPane tableTPanel;
 	public DefaultTableModel testModel = new DefaultTableModel();
-	private DefaultTableModel models[] = new DefaultTableModel[10];
+	private DefaultTableModel models[] = new DefaultTableModel[20];
+	private JTable[] tables = new JTable[20];
 	private ControlPanel controlPanel;
 
 	public Gui(BugTracer bugTracer) {
@@ -170,11 +171,11 @@ public class Gui implements ActionListener, ChangeListener {
 	private void addTab(String tabName) {
 		DefaultTableModel model = new DefaultTableModel();
 		JTable table = new JTable(model);
-		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		JScrollPane sPane = new JScrollPane(table);
 		sPane.setName(tabName);
 		tableTPanel.addTab(tabName, null, sPane, null);
-		models[tableTPanel.getTabCount() - 1] = model;
+		tables[tableTPanel.getTabCount() - 1] = table;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -224,8 +225,8 @@ public class Gui implements ActionListener, ChangeListener {
 	public void stateChanged(ChangeEvent state) {
 		String tableName = tableTPanel.getSelectedComponent().getName();
 		int i = tableTPanel.getSelectedIndex();
-		if (models[i] != null) {
-			controlPanel.setActiveModel(models[i], tableName);
+		if (tables[i] != null) {
+			controlPanel.setActiveJTable(tables[i], tableName);
 		}
 	}
 

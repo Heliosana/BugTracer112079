@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -24,6 +25,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 	private String tableName;
 	private ResultSet rslt;
 	private ResultSetMetaData rsltMetaData;
+	private JTable table;
 
 	public ControlPanel(Gui gui, DefaultTableModel tableModel) {
 		this.gui = gui;
@@ -48,13 +50,13 @@ public class ControlPanel extends JPanel implements ActionListener,
 		gbc_btnAdd.gridy = 0;
 		add(btnAdd, gbc_btnAdd);
 
-		JButton btnTest = new JButton("Test");
-		btnTest.addActionListener(this);
-		GridBagConstraints gbc_btnTest = new GridBagConstraints();
-		gbc_btnTest.insets = new Insets(0, 0, 5, 0);
-		gbc_btnTest.gridx = 0;
-		gbc_btnTest.gridy = 1;
-		add(btnTest, gbc_btnTest);
+		JButton btnDelete = new JButton("Delete");
+		btnDelete.addActionListener(this);
+		GridBagConstraints gbc_btnDelete = new GridBagConstraints();
+		gbc_btnDelete.insets = new Insets(0, 0, 5, 0);
+		gbc_btnDelete.gridx = 0;
+		gbc_btnDelete.gridy = 1;
+		add(btnDelete, gbc_btnDelete);
 
 		JButton btnreload = new JButton("Reload");
 		btnreload.addActionListener(this);
@@ -64,62 +66,13 @@ public class ControlPanel extends JPanel implements ActionListener,
 		gbc_btnLoad.gridy = 2;
 		add(btnreload, gbc_btnLoad);
 
-		JButton btnSave = new JButton("Save");
-		btnSave.addActionListener(this);
-		GridBagConstraints gbc_btnSave = new GridBagConstraints();
-		gbc_btnSave.insets = new Insets(0, 0, 5, 0);
-		gbc_btnSave.gridx = 0;
-		gbc_btnSave.gridy = 3;
-		add(btnSave, gbc_btnSave);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent event) {
-		if (event.getActionCommand() == "Add") {
-			try {
-				insert();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			state("add content");
-		} else if (event.getActionCommand() == "Reload") {
-			try {
-				reload();
-				state("reload content");
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if (event.getActionCommand() == "Save") {
-			// TODO
-			state("save content");
-		} else {
-			test();
-			state("test content");
-		}
-	}
-
-	private void insert() throws SQLException {
-		rslt.moveToInsertRow();
-		rslt.insertRow();
-		reload();
-	}
-
-	public void setActiveModel(DefaultTableModel tableModel, String tableName) {
-		state("switch to " + tableName);
-		if (tableModel != null) {
-			this.tableModel.removeTableModelListener(this);
-		}
-		this.tableModel = tableModel;
-		this.tableModel.addTableModelListener(this);
-		this.tableName = tableName;
-		try {
-			reload();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		JButton btnTest = new JButton("Test");
+		btnTest.addActionListener(this);
+		GridBagConstraints gbc_btnTest = new GridBagConstraints();
+		gbc_btnTest.insets = new Insets(0, 0, 5, 0);
+		gbc_btnTest.gridx = 0;
+		gbc_btnTest.gridy = 3;
+		add(btnTest, gbc_btnTest);
 	}
 
 	void reload() throws SQLException {
@@ -127,7 +80,34 @@ public class ControlPanel extends JPanel implements ActionListener,
 			loadSql();
 			rebuildModel();
 		} else
-			state("not connected to reload");
+			state("can't reload --> not connected");
+	}
+
+	private void insert() throws SQLException {
+		if (gui.connected) {
+			rslt.moveToInsertRow();
+			rslt.insertRow();
+			reload();
+		} else
+			state("can't add --> not connected");
+	}
+
+	private void delete() throws SQLException {
+		if (gui.connected) {
+			int row = table.getSelectedRow();
+			if (row != -1) {
+				rslt.absolute(++row);
+				try {
+					rslt.deleteRow();
+					reload();
+				} catch (SQLException e) {
+					state("cant delete insert row");
+				}
+			} else {
+				state("can't delete --> no row selected");
+			}
+		} else
+			state("can't delete --> not connected");
 	}
 
 	private void loadSql() throws SQLException {
@@ -162,19 +142,28 @@ public class ControlPanel extends JPanel implements ActionListener,
 
 	}
 
-	private void test() {
-
-	}
-
-	private void state(String state) {
-		gui.setState(state);
+	public void setActiveJTable(JTable table, String tableName) {
+		state("switch to " + tableName);
+		if (this.tableModel != null) {
+			this.tableModel.removeTableModelListener(this);
+		}
+		this.table = table;
+		this.tableModel = (DefaultTableModel) this.table.getModel();
+		this.tableModel.addTableModelListener(this);
+		this.tableName = tableName;
+		try {
+			reload();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void tableChanged(TableModelEvent event) {
 		if (TableModelEvent.ALL_COLUMNS == event.getColumn()) {
 			// rebuild the model
-		} else {
+		} else if (gui.connected) {
 			int column = event.getColumn();
 			int row = event.getFirstRow();
 			Object value = tableModel.getValueAt(row++, column++);
@@ -203,11 +192,76 @@ public class ControlPanel extends JPanel implements ActionListener,
 						e1.printStackTrace();
 					}
 				} else {
+					System.out.println(e.getErrorCode());
 					e.printStackTrace();
 				}
 			} finally {
 				// reload();
 			}
+		} else {
+			state("can't alter db --> not connected");
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		if (event.getActionCommand() == "Add") {
+			try {
+				insert();
+			} catch (SQLException e) {
+				if (e.getErrorCode() == 2627) {
+					// Verletzung der PRIMARY KEY-Einschränkung
+					try {
+						reload();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					state("double PRIMARY KEY");
+				} else if (e.getErrorCode() == 515) {
+					// NULL as PRIMARY KEY
+					try {
+						reload();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					state("Null as PRIMARY KEY");
+				} else {
+					System.out.println(e.getErrorCode());
+					e.printStackTrace();
+				}
+			}
+		} else if (event.getActionCommand() == "Reload") {
+			try {
+				reload();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (event.getActionCommand() == "Delete") {
+			try {
+				delete();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println(e.getErrorCode());
+			}
+		} else {
+			test();
+		}
+	}
+
+	private void state(String state) {
+		gui.setState(state);
+	}
+
+	private void test() {
+		System.out.println(table.getSelectedRow());
+		// Vector data = new Vector();
+		// for (int i = 1; i < tableModel.getRowCount(); ++i) {
+		// data.add(i);
+		// }
+		// tableModel.addColumn("index", data);
 	}
 }
