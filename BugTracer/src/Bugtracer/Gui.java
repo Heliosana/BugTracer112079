@@ -141,18 +141,19 @@ public class Gui implements ActionListener, ChangeListener {
 		addTab("Adresse");
 
 		controlPanel = new ControlPanel(this, testModel);
-		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel.getLayout();
-		gridBagLayout_1.columnWidths = new int[] {100};
-		gridBagLayout_1.rowHeights = new int[] {50, 50, 50, 50, 50};
+		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel
+				.getLayout();
+		gridBagLayout_1.columnWidths = new int[] { 100 };
+		gridBagLayout_1.rowHeights = new int[] { 50, 50, 50, 50, 50 };
 		controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagConstraints gbc_controlPanel = new GridBagConstraints();
 		gbc_controlPanel.fill = GridBagConstraints.VERTICAL;
-//		gbc_controlPanel.anchor = GridBagConstraints.NORTH;
-//		gbc_controlPanel.insets = new Insets(0, 0, 5, 0);
+		// gbc_controlPanel.anchor = GridBagConstraints.NORTH;
+		// gbc_controlPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_controlPanel.gridx = 1;
 		gbc_controlPanel.gridy = 1;
 		frame.getContentPane().add(controlPanel, gbc_controlPanel);
-//		controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		// controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 
 		statepane = new JLabel();
 		statepane.setHorizontalAlignment(SwingConstants.CENTER);
@@ -183,6 +184,7 @@ public class Gui implements ActionListener, ChangeListener {
 			statement = bugTracer.connect(serverIPTextfield.getText(),
 					serverNameTextfield.getText(),
 					loginnameTextfield.getText(), pwField.getText());
+			controlPanel.actionPerformed(new ActionEvent(this, 0, "Reload"));
 		} catch (IllegalArgumentException e) {
 			new ErrorFrame(e);
 		}
@@ -191,6 +193,7 @@ public class Gui implements ActionListener, ChangeListener {
 
 	private void logout() {
 		bugTracer.disconnect();
+
 	}
 
 	public void setdisconnected() {
@@ -219,10 +222,10 @@ public class Gui implements ActionListener, ChangeListener {
 
 	@Override
 	public void stateChanged(ChangeEvent state) {
-		String tableName= tableTPanel.getSelectedComponent().getName();
+		String tableName = tableTPanel.getSelectedComponent().getName();
 		int i = tableTPanel.getSelectedIndex();
 		if (models[i] != null) {
-			controlPanel.setActiveModel(models[i],tableName);
+			controlPanel.setActiveModel(models[i], tableName);
 		}
 	}
 

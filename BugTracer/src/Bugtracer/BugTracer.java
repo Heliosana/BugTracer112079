@@ -66,7 +66,8 @@ public class BugTracer {
 							+ dbUsr + "\ndbPassword: " + dbPwd, e);
 		}
 		try {
-			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					ResultSet.CONCUR_UPDATABLE);
 			gui.setconnected();
 		} catch (SQLException e) {
 			System.out.println("can't create statement on connection");

@@ -15,7 +15,7 @@ import javax.swing.SwingConstants;
 public class ErrorFrame extends JFrame implements ActionListener {
 
 	ErrorFrame(Exception exc) {
-//		exc.printStackTrace();
+		// exc.printStackTrace();
 		getContentPane().setBackground(Color.RED);
 		setTitle("Error");
 		this.setBounds(0, 0, 328, 273);

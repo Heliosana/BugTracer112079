@@ -76,11 +76,21 @@ public class ControlPanel extends JPanel implements ActionListener,
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == "Add") {
-			// TODO
+			try {
+				insert();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			state("add content");
 		} else if (event.getActionCommand() == "Reload") {
-			state("reload content");
-			reload();
+			try {
+				reload();
+				state("reload content");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (event.getActionCommand() == "Save") {
 			// TODO
 			state("save content");
@@ -88,6 +98,12 @@ public class ControlPanel extends JPanel implements ActionListener,
 			test();
 			state("test content");
 		}
+	}
+
+	private void insert() throws SQLException {
+		rslt.moveToInsertRow();
+		rslt.insertRow();
+		reload();
 	}
 
 	public void setActiveModel(DefaultTableModel tableModel, String tableName) {
@@ -98,10 +114,15 @@ public class ControlPanel extends JPanel implements ActionListener,
 		this.tableModel = tableModel;
 		this.tableModel.addTableModelListener(this);
 		this.tableName = tableName;
-		reload();
+		try {
+			reload();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	private void reload() {
+	void reload() throws SQLException {
 		if (gui.connected) {
 			loadSql();
 			rebuildModel();
@@ -109,48 +130,36 @@ public class ControlPanel extends JPanel implements ActionListener,
 			state("not connected to reload");
 	}
 
-	private void loadSql() {
+	private void loadSql() throws SQLException {
 		state("load sql table from db");
 		if (rslt != null) {
-			try {
-				rslt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			rslt.close();
 		}
-		try {
-			rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
-			rsltMetaData = rslt.getMetaData();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
+		rsltMetaData = rslt.getMetaData();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void rebuildModel() {
+	private void rebuildModel() throws SQLException {
 		state("reload model");
 		Vector columnNames = new Vector();
 		Vector data = new Vector();
-		try {
-			int columns = rsltMetaData.getColumnCount();
-			for (int i = 1; i <= columns; i++) {
-				columnNames.addElement(rsltMetaData.getColumnName(i));
-			}
-			while (rslt.next()) {
-				Vector row = new Vector(columns);
-				for (int i = 1; i <= columns; i++) {
-					row.addElement(rslt.getObject(i));
-				}
-				data.addElement(row);
-			}
-			data.addElement(new Vector(columns));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			// System.out.println(data.toString()+columnNames.toString());
-			tableModel.setDataVector(data, columnNames);
+		rslt.beforeFirst();
+		int columns = rsltMetaData.getColumnCount();
+		for (int i = 1; i <= columns; i++) {
+			columnNames.addElement(rsltMetaData.getColumnName(i));
 		}
+		while (rslt.next()) {
+			Vector row = new Vector(columns);
+			for (int i = 1; i <= columns; i++) {
+				row.addElement(rslt.getObject(i));
+			}
+			data.addElement(row);
+		}
+		data.addElement(new Vector(columns));
+		// System.out.println(data.toString()+columnNames.toString());
+		tableModel.setDataVector(data, columnNames);
+
 	}
 
 	private void test() {
@@ -170,33 +179,34 @@ public class ControlPanel extends JPanel implements ActionListener,
 			int row = event.getFirstRow();
 			Object value = tableModel.getValueAt(row++, column++);
 			try {
-				rslt.moveToCurrentRow();
-				int actRow = rslt.getRow();
-				if (!(actRow == row)) {
-					rslt.updateRow();
-					state("update row: " + actRow + " to db");
-					rslt.absolute(row);
+				rslt.absolute(row);
+				Object old = rslt.getObject(column);
+				if (old == null) {
+					old = "";
 				}
-				System.out.println(rslt.getObject(column));
-				if (value != rslt.getObject(column)) {
+				// System.out.println(old + "\t-->\t" + value);
+				if (!value.toString().equals(old.toString())) {
+					// new and old values different
 					rslt.updateObject(column, value);
-					// rslt.updateRow();
-					state("update x: " + column + " - y: " + row + " to: "
+					rslt.updateRow();
+					state("update x: " + column + " ; y: " + row + " to: "
 							+ value);
 				}
 			} catch (SQLException e) {
-				try {
-					// FIXME NULL-Werte --> Fehler bei INSERT
-					rslt.moveToInsertRow();
-					System.out.println(rslt.getRow()); // get insert row id
-					rslt.updateObject(column, value);
-					rslt.insertRow();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				if (e.getErrorCode() == 0) {
+					// row not in set --> insert row
+					try {
+						rslt.moveToInsertRow();
+						rslt.updateObject(column, value);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} else {
+					e.printStackTrace();
 				}
 			} finally {
-				reload();
+				// reload();
 			}
 		}
 	}
