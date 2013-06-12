@@ -236,16 +236,15 @@ public class ControlPanel extends JPanel implements ActionListener,
 			try {
 				reload();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				state("can't reload --> error: " + e.getErrorCode());
+				// e.printStackTrace();
 			}
 		} else if (event.getActionCommand() == "Delete") {
 			try {
 				delete();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println(e.getErrorCode());
+				state("can't delete --> error: " + e.getErrorCode());
+				// e.printStackTrace();
 			}
 		} else {
 			test();
@@ -257,11 +256,6 @@ public class ControlPanel extends JPanel implements ActionListener,
 	}
 
 	private void test() {
-		System.out.println(table.getSelectedRow());
-		// Vector data = new Vector();
-		// for (int i = 1; i < tableModel.getRowCount(); ++i) {
-		// data.add(i);
-		// }
-		// tableModel.addColumn("index", data);
+		// TODO someting testing
 	}
 }

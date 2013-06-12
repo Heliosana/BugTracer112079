@@ -40,7 +40,6 @@ public class Gui implements ActionListener, ChangeListener {
 	private JLabel statepane;
 	private JTabbedPane tableTPanel;
 	public DefaultTableModel testModel = new DefaultTableModel();
-	private DefaultTableModel models[] = new DefaultTableModel[20];
 	private JTable[] tables = new JTable[20];
 	private ControlPanel controlPanel;
 
