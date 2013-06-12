@@ -5,22 +5,16 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 
 public class ControlPanel extends JPanel implements ActionListener,
 		TableModelListener {
@@ -169,7 +163,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 
 	@Override
 	public void tableChanged(TableModelEvent event) {
-		if (event.ALL_COLUMNS == event.getColumn()) {
+		if (TableModelEvent.ALL_COLUMNS == event.getColumn()) {
 			// rebuild the model
 		} else {
 			int column = event.getColumn() + 1;

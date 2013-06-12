@@ -24,11 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import javax.swing.BoxLayout;
 
 public class Gui implements ActionListener, ChangeListener {
 
@@ -125,7 +121,7 @@ public class Gui implements ActionListener, ChangeListener {
 		btnLogout.addActionListener(this);
 		loginPanel.add(btnLogout);
 
-		tableTPanel = new JTabbedPane(JTabbedPane.TOP);
+		tableTPanel = new JTabbedPane(SwingConstants.TOP);
 		tableTPanel.addChangeListener(this);
 
 		GridBagConstraints gbc_tableTabbedPanel = new GridBagConstraints();
