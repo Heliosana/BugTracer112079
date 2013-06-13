@@ -9,8 +9,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class ReferencePane extends JPanel implements ChangeListener {
+public class ReferencePane extends JPanel implements ChangeListener,
+		ListSelectionListener {
 
 	private Gui gui;
 	private String mainTableName;
@@ -26,14 +29,8 @@ public class ReferencePane extends JPanel implements ChangeListener {
 		setLayout(new BorderLayout(0, 0));
 		mainTablePane = new TablePane(gui, mainTableName);
 		this.add(mainTablePane);
-	}
+		mainTablePane.addListSelectionListener(this);
 
-	@Override
-	public void stateChanged(ChangeEvent event) {
-		JTabbedPane source = ((JTabbedPane) event.getSource());
-		if (source.getSelectedComponent().equals(this)) {
-			reload();
-		}
 	}
 
 	private void reload() {
@@ -79,5 +76,19 @@ public class ReferencePane extends JPanel implements ChangeListener {
 
 	private void state(String state) {
 		gui.setState(state);
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent event) {
+		JTabbedPane source = ((JTabbedPane) event.getSource());
+		if (source.getSelectedComponent().equals(this)) {
+			reload();
+		}
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent event) {
+		// TODO ListSelectionEvent
+		event.getSource();
 	}
 }

@@ -19,6 +19,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
 
 public class Gui implements ActionListener {
 
@@ -192,7 +193,9 @@ public class Gui implements ActionListener {
 			statement = bugTracer.connect(serverIPTextfield.getText(),
 					serverNameTextfield.getText(),
 					loginnameTextfield.getText(), pwField.getText());
-			tabbedPanel.firePropertyChange("login", false, true);
+			ReferencePane toFire = (ReferencePane) tabbedPanel
+					.getSelectedComponent();
+			toFire.stateChanged(new ChangeEvent(tabbedPanel));
 		} catch (IllegalArgumentException e) {
 			new ErrorFrame(e);
 		}
@@ -232,12 +235,4 @@ public class Gui implements ActionListener {
 		tabbedPanel.addChangeListener(referencePane);
 	}
 
-	// @Override
-	// public void stateChanged(ChangeEvent state) {
-	// String tableName = tableTPanel.getSelectedComponent().getName();
-	// int i = tableTPanel.getSelectedIndex();
-	// if (tables[i] != null) {
-	// controlPanel.setActiveJTable(tables[i], tableName);
-	// }
-	// }
 }

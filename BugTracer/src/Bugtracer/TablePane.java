@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -88,7 +89,7 @@ public class TablePane extends JPanel implements ActionListener,
 	}
 
 	private void test() throws SQLException {
-		// TODO Auto-generated method stub
+		// TODO someting testing
 	}
 
 	private void insert() throws SQLException {
@@ -285,5 +286,9 @@ public class TablePane extends JPanel implements ActionListener,
 		} else {
 			state("can't alter db --> not connected");
 		}
+	}
+
+	public void addListSelectionListener(ListSelectionListener listener) {
+		table.getSelectionModel().addListSelectionListener(listener);
 	}
 }
