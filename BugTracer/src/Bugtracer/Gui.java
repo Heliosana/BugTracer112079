@@ -33,7 +33,6 @@ public class Gui implements ActionListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tabbedPanel;
-	
 
 	// private JTable[] tables = new JTable[20];
 	// private ControlPanel controlPanel;
@@ -74,9 +73,9 @@ public class Gui implements ActionListener {
 		addTab("Tester");
 		addTab("UserData");
 		addTab("Adresse");
-		addTab("Developer");
-		addTab("BugTester");
-		addTab("AllUser");
+		// addTab("Developer");
+		// addTab("BugTester");
+		// addTab("AllUser");
 	}
 
 	private void initialize() {
@@ -85,9 +84,10 @@ public class Gui implements ActionListener {
 		frame.setBounds(0, 0, 1005, 710);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] {20, 1101, 20, 0};
-		gridBagLayout.rowHeights = new int[] {30, 737, 20, 0};
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] { 20, 1101, 20, 0 };
+		gridBagLayout.rowHeights = new int[] { 30, 737, 20, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0,
+				Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);

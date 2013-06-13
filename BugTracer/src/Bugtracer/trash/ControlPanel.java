@@ -19,7 +19,6 @@ import javax.swing.table.DefaultTableModel;
 
 import Bugtracer.Gui;
 
-
 public class ControlPanel extends JPanel implements ActionListener,
 		TableModelListener {
 

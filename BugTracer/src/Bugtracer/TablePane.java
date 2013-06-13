@@ -16,13 +16,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-public class TablePane extends JPanel implements ActionListener, TableModelListener {
+public class TablePane extends JPanel implements ActionListener,
+		TableModelListener {
 
 	private DefaultTableModel tableModel;
 	private JTable table;
@@ -164,16 +163,16 @@ public class TablePane extends JPanel implements ActionListener, TableModelListe
 	}
 
 	public void setSelectedRow(int ID) throws SQLException {
-		boolean found=false;
+		boolean found = false;
 		rslt.beforeFirst();
 		while (rslt.next()) {
 			if (rslt.getInt(1) == ID) {
-				  found = true;
+				found = true;
 				break;
 			}
 		}
 		if (found) {
-//			table. (rslt.getRow());
+			// table. (rslt.getRow());
 		} else {
 			// TODO no refernced ID
 		}

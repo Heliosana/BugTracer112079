@@ -1,16 +1,14 @@
 package Bugtracer;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.BorderLayout;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Types;
 
 public class ReferencePane extends JPanel implements ChangeListener {
 
@@ -34,7 +32,7 @@ public class ReferencePane extends JPanel implements ChangeListener {
 	public void stateChanged(ChangeEvent event) {
 		JTabbedPane source = ((JTabbedPane) event.getSource());
 		if (source.getSelectedComponent().equals(this)) {
-			reload();			
+			reload();
 		}
 	}
 
@@ -70,11 +68,11 @@ public class ReferencePane extends JPanel implements ChangeListener {
 	}
 
 	private void test() throws SQLException {
-		System.out.print("\n-->"+mainTableName+": ");
+		System.out.print("\n-->" + mainTableName + ": ");
 		for (int i = 1; i <= rsltMetaData.getColumnCount(); i++) {
-//			System.out.println(rsltMetaData.getCatalogName(i));
-//			System.out.print(rsltMetaData.getColumnClassName(i));
-//			System.out.print(rsltMetaData.getTableName(i));
+			// System.out.println(rsltMetaData.getCatalogName(i));
+			// System.out.print(rsltMetaData.getColumnClassName(i));
+			// System.out.print(rsltMetaData.getTableName(i));
 			System.out.println(rsltMetaData.getColumnType(i));
 		}
 	}
