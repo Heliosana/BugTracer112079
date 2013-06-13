@@ -1,4 +1,4 @@
-package Bugtracer;
+package Bugtracer.trash;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,6 +17,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import Bugtracer.Gui;
+
+
 public class ControlPanel extends JPanel implements ActionListener,
 		TableModelListener {
 
@@ -27,7 +30,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 	private ResultSetMetaData rsltMetaData;
 	private JTable table;
 
-	public ControlPanel(Gui gui) {
+	private ControlPanel(Gui gui) {
 		this.gui = gui;
 		initialize();
 	}
@@ -74,14 +77,6 @@ public class ControlPanel extends JPanel implements ActionListener,
 		add(btnTest, gbc_btnTest);
 	}
 
-	void reload() throws SQLException {
-		if (gui.connected) {
-			loadSql();
-			rebuildModel();
-		} else
-			state("can't reload --> not connected");
-	}
-
 	private void insert() throws SQLException {
 		if (gui.connected) {
 			rslt.moveToInsertRow();
@@ -107,6 +102,14 @@ public class ControlPanel extends JPanel implements ActionListener,
 			}
 		} else
 			state("can't delete --> not connected");
+	}
+
+	private void reload() throws SQLException {
+		if (gui.connected) {
+			loadSql();
+			rebuildModel();
+		} else
+			state("can't reload --> not connected");
 	}
 
 	private void loadSql() throws SQLException {
@@ -257,4 +260,5 @@ public class ControlPanel extends JPanel implements ActionListener,
 	private void test() {
 		// TODO someting testing
 	}
+
 }

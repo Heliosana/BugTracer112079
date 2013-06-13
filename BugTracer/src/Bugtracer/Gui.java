@@ -15,18 +15,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
 
-public class Gui implements ActionListener, ChangeListener {
+public class Gui implements ActionListener {
 
 	private BugTracer bugTracer;
 	private JTextField loginnameTextfield;
@@ -38,22 +32,39 @@ public class Gui implements ActionListener, ChangeListener {
 	private JTextField serverNameTextfield;
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
-	private JTabbedPane tableTPanel;
+	private JTabbedPane tabbedPanel;
 
-	private JTable[] tables = new JTable[20];
-	private ControlPanel controlPanel;
+	// private JTable[] tables = new JTable[20];
+	// private ControlPanel controlPanel;
 
 	public Gui(BugTracer bugTracer) {
 		this.bugTracer = bugTracer;
 		initialize();
+		createTabs();
 		setdisconnected();
-		tableTPanel.setSelectedIndex(1);
-		tableTPanel.setSelectedIndex(0);
+		// tableTPanel.setSelectedIndex(1);
+		// tableTPanel.setSelectedIndex(0);
 		setState("gui started");
 		frame.setVisible(true);
 	}
 
+	// private void addTab(String tabName) {
+	// DefaultTableModel model = new DefaultTableModel();
+	// JTable table = new JTable(model);
+	// table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+	// JScrollPane sPane = new JScrollPane(table);
+	// sPane.setName(tabName);
+	// tableTPanel.addTab(tabName, null, sPane, null);
+	// tables[tableTPanel.getTabCount() - 1] = table;
+	// }
+
+	private void addTab(String name) {
+		tabbedPanel.addTab(name, null, new ReferencePane(this, name), null);
+	}
+
 	private void createTabs() {
+		// testTab("userdata");
+
 		addTab("Projekt");
 		addTab("Release");
 		addTab("Bug");
@@ -73,9 +84,9 @@ public class Gui implements ActionListener, ChangeListener {
 		frame.setBounds(0, 0, 1005, 710);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 1101, 10, 0 };
-		gridBagLayout.rowHeights = new int[] { 33, 737, 14, 0 };
-		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] {20, 1101, 20, 0};
+		gridBagLayout.rowHeights = new int[] {30, 737, 20, 0};
+		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
@@ -83,14 +94,14 @@ public class Gui implements ActionListener, ChangeListener {
 		loginPanel = new JPanel();
 		loginPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagConstraints gbc_loginPanel = new GridBagConstraints();
-		gbc_loginPanel.gridwidth = 2;
+		gbc_loginPanel.gridwidth = 3;
 		gbc_loginPanel.anchor = GridBagConstraints.NORTH;
 		gbc_loginPanel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_loginPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_loginPanel.gridx = 0;
 		gbc_loginPanel.gridy = 0;
 		frame.getContentPane().add(loginPanel, gbc_loginPanel);
-		loginPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		loginPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JLabel lblServerip = new JLabel("Server-IP:");
 		loginPanel.add(lblServerip);
@@ -135,31 +146,29 @@ public class Gui implements ActionListener, ChangeListener {
 		btnLogout.addActionListener(this);
 		loginPanel.add(btnLogout);
 
-		tableTPanel = new JTabbedPane(SwingConstants.TOP);
-		tableTPanel.addChangeListener(this);
+		tabbedPanel = new JTabbedPane(SwingConstants.TOP);
+		// tableTPanel.addChangeListener(this);
 
 		GridBagConstraints gbc_tableTabbedPanel = new GridBagConstraints();
 		gbc_tableTabbedPanel.fill = GridBagConstraints.BOTH;
 		gbc_tableTabbedPanel.insets = new Insets(0, 0, 5, 5);
-		gbc_tableTabbedPanel.gridx = 0;
+		gbc_tableTabbedPanel.gridx = 1;
 		gbc_tableTabbedPanel.gridy = 1;
-		frame.getContentPane().add(tableTPanel, gbc_tableTabbedPanel);
+		frame.getContentPane().add(tabbedPanel, gbc_tableTabbedPanel);
 
-		createTabs();
-
-		controlPanel = new ControlPanel(this);
-		GridBagLayout gridBagLayout_1 = (GridBagLayout) controlPanel
-				.getLayout();
-		gridBagLayout_1.columnWidths = new int[] { 100 };
-		gridBagLayout_1.rowHeights = new int[] { 50, 50, 50, 50, 50 };
-		controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		GridBagConstraints gbc_controlPanel = new GridBagConstraints();
-		gbc_controlPanel.fill = GridBagConstraints.VERTICAL;
+		// controlPanel = new ControlPanel(this);
+		// GridBagLayout gridBagLayout_1 = (GridBagLayout)
+		// controlPanel.getLayout();
+		// gridBagLayout_1.columnWidths = new int[] { 100 };
+		// gridBagLayout_1.rowHeights = new int[] { 50, 50, 50, 50, 50 };
+		// controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		// GridBagConstraints gbc_controlPanel = new GridBagConstraints();
+		// gbc_controlPanel.fill = GridBagConstraints.VERTICAL;
 		// gbc_controlPanel.anchor = GridBagConstraints.NORTH;
 		// gbc_controlPanel.insets = new Insets(0, 0, 5, 0);
-		gbc_controlPanel.gridx = 1;
-		gbc_controlPanel.gridy = 1;
-		frame.getContentPane().add(controlPanel, gbc_controlPanel);
+		// gbc_controlPanel.gridx = 1;
+		// gbc_controlPanel.gridy = 1;
+		// frame.getContentPane().add(controlPanel, gbc_controlPanel);
 		// controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 
 		statepane = new JLabel();
@@ -168,20 +177,11 @@ public class Gui implements ActionListener, ChangeListener {
 		statepane.setBackground(Color.black);
 		statepane.setForeground(Color.BLACK);
 		GridBagConstraints gbc_statepane = new GridBagConstraints();
+		gbc_statepane.insets = new Insets(0, 0, 0, 5);
 		gbc_statepane.anchor = GridBagConstraints.SOUTHEAST;
-		gbc_statepane.gridx = 0;
+		gbc_statepane.gridx = 1;
 		gbc_statepane.gridy = 2;
 		frame.getContentPane().add(statepane, gbc_statepane);
-	}
-
-	private void addTab(String tabName) {
-		DefaultTableModel model = new DefaultTableModel();
-		JTable table = new JTable(model);
-		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		JScrollPane sPane = new JScrollPane(table);
-		sPane.setName(tabName);
-		tableTPanel.addTab(tabName, null, sPane, null);
-		tables[tableTPanel.getTabCount() - 1] = table;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -191,7 +191,7 @@ public class Gui implements ActionListener, ChangeListener {
 			statement = bugTracer.connect(serverIPTextfield.getText(),
 					serverNameTextfield.getText(),
 					loginnameTextfield.getText(), pwField.getText());
-			controlPanel.actionPerformed(new ActionEvent(this, 0, "Reload"));
+			tabbedPanel.firePropertyChange("login", false, true);
 		} catch (IllegalArgumentException e) {
 			new ErrorFrame(e);
 		}
@@ -227,13 +227,16 @@ public class Gui implements ActionListener, ChangeListener {
 		statepane.setText("state:  " + state + "...");
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent state) {
-		String tableName = tableTPanel.getSelectedComponent().getName();
-		int i = tableTPanel.getSelectedIndex();
-		if (tables[i] != null) {
-			controlPanel.setActiveJTable(tables[i], tableName);
-		}
+	public void addtabbedPanelListener(ReferencePane referencePane) {
+		tabbedPanel.addChangeListener(referencePane);
 	}
 
+	// @Override
+	// public void stateChanged(ChangeEvent state) {
+	// String tableName = tableTPanel.getSelectedComponent().getName();
+	// int i = tableTPanel.getSelectedIndex();
+	// if (tables[i] != null) {
+	// controlPanel.setActiveJTable(tables[i], tableName);
+	// }
+	// }
 }
