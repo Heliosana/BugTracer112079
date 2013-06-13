@@ -33,6 +33,7 @@ public class Gui implements ActionListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tabbedPanel;
+	
 
 	// private JTable[] tables = new JTable[20];
 	// private ControlPanel controlPanel;

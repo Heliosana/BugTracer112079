@@ -18,20 +18,22 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-public class TablePane extends JPanel implements ActionListener {
+public class TablePane extends JPanel implements ActionListener, TableModelListener {
 
-	private String tableName;
 	private DefaultTableModel tableModel;
 	private JTable table;
 	private Gui gui;
 	private ResultSet rslt;
 	private ResultSetMetaData rsltMetaData;
+	private final JButton btntest = new JButton("Test");
 
 	public TablePane(Gui gui, String tableName) {
 		this.gui = gui;
-		this.tableName = tableName;
+		setName(tableName);
 		initialize();
 
 	}
@@ -40,8 +42,9 @@ public class TablePane extends JPanel implements ActionListener {
 		setLayout(new BorderLayout(0, 0));
 
 		tableModel = new DefaultTableModel();
+		tableModel.addTableModelListener(this);
 		table = new JTable(tableModel);
-		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane scrollPane = new JScrollPane(table);
 		add(scrollPane);
 
@@ -49,9 +52,9 @@ public class TablePane extends JPanel implements ActionListener {
 		add(controlPanel, BorderLayout.EAST);
 		GridBagLayout gbl_controlPanel = new GridBagLayout();
 		gbl_controlPanel.columnWidths = new int[] { 50, 0 };
-		gbl_controlPanel.rowHeights = new int[] { 20, 20, 20, 0 };
+		gbl_controlPanel.rowHeights = new int[] { 20, 20, 20, 0, 0 };
 		gbl_controlPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_controlPanel.rowWeights = new double[] { 1.0, 1.0, 1.0,
+		gbl_controlPanel.rowWeights = new double[] { 1.0, 1.0, 1.0, 0.0,
 				Double.MIN_VALUE };
 		controlPanel.setLayout(gbl_controlPanel);
 
@@ -73,13 +76,19 @@ public class TablePane extends JPanel implements ActionListener {
 
 		JButton btnReload = new JButton("Reload");
 		GridBagConstraints gbc_btnReload = new GridBagConstraints();
+		gbc_btnReload.insets = new Insets(0, 0, 5, 0);
 		btnReload.addActionListener(this);
 		gbc_btnReload.gridx = 0;
 		gbc_btnReload.gridy = 2;
 		controlPanel.add(btnReload, gbc_btnReload);
+		GridBagConstraints gbc_btntest = new GridBagConstraints();
+		gbc_btntest.gridx = 0;
+		gbc_btntest.gridy = 3;
+		btntest.addActionListener(this);
+		controlPanel.add(btntest, gbc_btntest);
 	}
 
-	private void test() {
+	private void test() throws SQLException {
 		// TODO Auto-generated method stub
 	}
 
@@ -110,7 +119,7 @@ public class TablePane extends JPanel implements ActionListener {
 			state("can't delete --> not connected");
 	}
 
-	 public void reload() throws SQLException {
+	public void reload() throws SQLException {
 		if (gui.connected) {
 			loadSql();
 			rebuildModel();
@@ -123,7 +132,7 @@ public class TablePane extends JPanel implements ActionListener {
 		if (rslt != null) {
 			rslt.close();
 		}
-		rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
+		rslt = gui.statement.executeQuery("SELECT * FROM " + getName());
 		rsltMetaData = rslt.getMetaData();
 	}
 
@@ -148,6 +157,38 @@ public class TablePane extends JPanel implements ActionListener {
 		// System.out.println(data.toString()+columnNames.toString());
 		tableModel.setDataVector(data, columnNames);
 
+	}
+
+	private void state(String state) {
+		gui.setState(state);
+	}
+
+	public void setSelectedRow(int ID) throws SQLException {
+		boolean found=false;
+		rslt.beforeFirst();
+		while (rslt.next()) {
+			if (rslt.getInt(1) == ID) {
+				  found = true;
+				break;
+			}
+		}
+		if (found) {
+//			table. (rslt.getRow());
+		} else {
+			// TODO no refernced ID
+		}
+	}
+
+	public void setSelectedID(TablePane refTablePane) throws SQLException {
+		refTablePane.getName();
+		refTablePane.getSelectedRowID();
+		// TODO
+	}
+
+	public int getSelectedRowID() throws SQLException {
+		int row = table.getSelectedRow();
+		rslt.absolute(++row);
+		return rslt.getInt(1);
 	}
 
 	@Override
@@ -194,11 +235,56 @@ public class TablePane extends JPanel implements ActionListener {
 				// e.printStackTrace();
 			}
 		} else {
-			test();
+			try {
+				test();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
-	private void state(String state) {
-		gui.setState(state);
+	@Override
+	public void tableChanged(TableModelEvent event) {
+		if (TableModelEvent.ALL_COLUMNS == event.getColumn()) {
+			// rebuild the model
+		} else if (gui.connected) {
+			int column = event.getColumn();
+			int row = event.getFirstRow();
+			Object value = tableModel.getValueAt(row++, column++);
+			try {
+				rslt.absolute(row);
+				Object old = rslt.getObject(column);
+				if (old == null) {
+					old = "";
+				}
+				// System.out.println(old + "\t-->\t" + value);
+				if (!value.toString().equals(old.toString())) {
+					// new and old values different
+					rslt.updateObject(column, value);
+					rslt.updateRow();
+					state("update x: " + column + " ; y: " + row + " to: "
+							+ value);
+				}
+			} catch (SQLException e) {
+				if (e.getErrorCode() == 0) {
+					// row not in set --> insert row
+					try {
+						rslt.moveToInsertRow();
+						rslt.updateObject(column, value);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} else {
+					System.out.println(e.getErrorCode());
+					e.printStackTrace();
+				}
+			} finally {
+				// reload();
+			}
+		} else {
+			state("can't alter db --> not connected");
+		}
 	}
 }
