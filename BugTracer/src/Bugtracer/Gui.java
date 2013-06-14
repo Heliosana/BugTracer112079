@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.swing.JButton;
@@ -34,6 +35,7 @@ public class Gui implements ActionListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tabbedPanel;
+	SQLExceptionHandler sqlexceptionhandler;
 
 	// private JTable[] tables = new JTable[20];
 	// private ControlPanel controlPanel;
@@ -45,6 +47,7 @@ public class Gui implements ActionListener {
 		setdisconnected();
 		// tableTPanel.setSelectedIndex(1);
 		// tableTPanel.setSelectedIndex(0);
+		sqlexceptionhandler=new SQLExceptionHandler(this);
 		setState("gui started");
 		frame.setVisible(true);
 	}
@@ -230,9 +233,15 @@ public class Gui implements ActionListener {
 	public void setState(String state) {
 		statepane.setText("state:  " + state + "...");
 	}
-
+	
+	
 	public void addtabbedPanelListener(ReferencePane referencePane) {
 		tabbedPanel.addChangeListener(referencePane);
 	}
 
+	public void handleSQLException(SQLException exe){
+		sqlexceptionhandler.SQLExceptionInterpreter(exe);
+	}
+	
+	
 }

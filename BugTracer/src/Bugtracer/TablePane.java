@@ -111,9 +111,11 @@ public class TablePane extends JPanel implements ActionListener,
 					reload();
 				} catch (SQLException e) {
 					state("cant delete insert row");
+					gui.handleSQLException(e);
 				}
 			} else {
 				state("can't delete --> no row selected");
+				
 			}
 		} else
 			state("can't delete --> not connected");
@@ -206,6 +208,7 @@ public class TablePane extends JPanel implements ActionListener,
 						e1.printStackTrace();
 					}
 					state("double PRIMARY KEY");
+					gui.handleSQLException(e);
 				     
 				} else if (e.getErrorCode() == 515) {
 					// NULL as PRIMARY KEY
