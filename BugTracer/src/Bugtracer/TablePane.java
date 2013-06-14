@@ -206,6 +206,7 @@ public class TablePane extends JPanel implements ActionListener,
 						e1.printStackTrace();
 					}
 					state("double PRIMARY KEY");
+				     
 				} else if (e.getErrorCode() == 515) {
 					// NULL as PRIMARY KEY
 					try {
