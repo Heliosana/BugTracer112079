@@ -15,7 +15,6 @@ import java.sql.Statement;
  */
 public class BugTracer {
 
-	
 	/**
 	 * @param args
 	 */
@@ -36,14 +35,12 @@ public class BugTracer {
 
 	public BugTracer() {
 		gui = new Gui(this);
-	
+
 		// if (connect() != null) {
 		// disconnect();
 		// gui.setState("connection avaiable");
 		// }
 	}
-
-	
 
 	private Statement connect() {
 		return connect(dbURL, dbName, dbUser, dbPwd);

@@ -20,7 +20,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
@@ -38,10 +37,7 @@ public class Gui implements ActionListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tabbedPanel;
-<<<<<<< HEAD
-	SQLExceptionHandler sqlexceptionhandler;
-=======
->>>>>>> try to sync
+	private SQLExceptionHandler sqlexceptionhandler;
 
 	// private JTable[] tables = new JTable[20];
 	// private ControlPanel controlPanel;
@@ -69,7 +65,7 @@ public class Gui implements ActionListener {
 		setdisconnected();
 		// tableTPanel.setSelectedIndex(1);
 		// tableTPanel.setSelectedIndex(0);
-		sqlexceptionhandler=new SQLExceptionHandler(this);
+		sqlexceptionhandler = new SQLExceptionHandler(this);
 		setState("gui started");
 		frame.setVisible(true);
 	}
@@ -110,16 +106,9 @@ public class Gui implements ActionListener {
 		frame.setBounds(0, 0, 1005, 710);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
-<<<<<<< HEAD
-		gridBagLayout.columnWidths = new int[] { 20, 1101, 20, 0 };
-		gridBagLayout.rowHeights = new int[] { 30, 737, 20, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0,
-				Double.MIN_VALUE };
-=======
 		gridBagLayout.columnWidths = new int[] { 1101, 0 };
 		gridBagLayout.rowHeights = new int[] { 30, 737, 20, 0 };
 		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
->>>>>>> try to sync
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
@@ -260,18 +249,12 @@ public class Gui implements ActionListener {
 	public void setState(String state) {
 		statepane.setText("state:  " + state + "...");
 	}
-	
-	
+
 	public void addtabbedPanelListener(ReferencePane referencePane) {
 		tabbedPanel.addChangeListener(referencePane);
 	}
 
-<<<<<<< HEAD
-	public void handleSQLException(SQLException exe){
+	public void handleSQLException(SQLException exe) {
 		sqlexceptionhandler.SQLExceptionInterpreter(exe);
 	}
-	
-	
-=======
->>>>>>> try to sync
 }
