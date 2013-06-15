@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -23,8 +23,9 @@ public class ReferencePane extends JPanel implements ChangeListener,
 	private ResultSet rslt;
 	private ResultSetMetaData rsltMetaData;
 	private boolean initialLoad = true;
-	private TreeMap<String, TablePane> referenceTable;
+	private ArrayList<TablePane> referenceTable;
 	private Statement statement;
+	private boolean firstloaded = false;
 
 	public ReferencePane(Gui gui, String name) {
 		this.gui = gui;
@@ -44,9 +45,10 @@ public class ReferencePane extends JPanel implements ChangeListener,
 			try {
 				mainTablePane.reload();
 				if (referenceTable != null) {
-					for (TablePane reference : referenceTable.values()) {
+					for (TablePane reference : referenceTable) {
 						reference.reload();
 					}
+					firstloaded = true;
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -78,14 +80,15 @@ public class ReferencePane extends JPanel implements ChangeListener,
 				try {
 					;
 					JPanel refencePane = new JPanel(new GridLayout(1, 0));
-					referenceTable = new TreeMap<String, TablePane>();
+					referenceTable = new ArrayList<TablePane>();
 					while (rslt.next()) {
-
 						this.add(refencePane);
 						TablePane referencedTable = new TablePane(gui,
-								rslt.getString(1), rslt.getString(2));
+								rslt.getString(1), rslt.getString(2),
+								rslt.getString(3));
+						referencedTable.addListSelectionListener(this);
 						refencePane.add(referencedTable);
-						referenceTable.put(rslt.getString(3), referencedTable);
+						referenceTable.add(referencedTable);
 					}
 					// }
 				} catch (SQLException e) {
@@ -122,7 +125,34 @@ public class ReferencePane extends JPanel implements ChangeListener,
 
 	@Override
 	public void valueChanged(ListSelectionEvent event) {
-		// TODO ListSelectionEvent
-		event.getSource();
+		if (gui.connected & firstloaded & !event.getValueIsAdjusting()) {
+			if (event.getSource().equals(mainTablePane.getListSelectionModel())) {
+				for (TablePane reference : referenceTable) {
+					try {
+						reference.setSelectedRow(mainTablePane);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			} else {
+				for (TablePane reference : referenceTable) {
+					if (reference.getListSelectionModel().equals(
+							event.getSource())) {
+						try {
+							mainTablePane.setReferencedID(reference);
+						} catch (SQLException e) {
+							if (e.getErrorCode() == 0) {
+								
+							} else {
+								// TODO Auto-generated catch block
+								System.out.println(e.getErrorCode());
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

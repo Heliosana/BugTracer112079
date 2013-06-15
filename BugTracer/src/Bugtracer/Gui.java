@@ -89,16 +89,15 @@ public class Gui implements ActionListener {
 	}
 
 	private void createTabs() {
-		// testTab("userdata");
 
+		addTab("UserData");
+		addTab("Adresse");
 		addTab("Projekt");
 		addTab("Release");
 		addTab("Bug");
 		addTab("Ticket");
 		addTab("Dev");
 		addTab("Tester");
-		addTab("UserData");
-		addTab("Adresse");
 		// addTab("Developer");
 		// addTab("BugTester");
 		// addTab("AllUser");
@@ -210,7 +209,7 @@ public class Gui implements ActionListener {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void login() {
+	void login() {
 		logout();
 		try {
 			connection = bugTracer.connect(serverIPTextfield.getText(),

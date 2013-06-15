@@ -18,13 +18,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 public class TablePane extends JPanel implements ActionListener,
-		TableModelListener {
+		TableModelListener, ListSelectionListener {
 
 	private DefaultTableModel tableModel;
 	private JTable table;
@@ -33,6 +34,9 @@ public class TablePane extends JPanel implements ActionListener,
 	private ResultSetMetaData rsltMetaData;
 	private final JButton btntest = new JButton("Test");
 	private String referencedColumnName;
+	private String parentColumnName;
+	private int lastSelectedRow;
+	private int insertrow;
 
 	public TablePane(Gui gui, String tableName) {
 		this.gui = gui;
@@ -43,9 +47,11 @@ public class TablePane extends JPanel implements ActionListener,
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public TablePane(Gui gui, String tableName, String referencedColumnName) {
+	public TablePane(Gui gui, String tableName, String referencedColumnName,
+			String parentColumnName) {
 		this(gui, tableName);
 		this.referencedColumnName = referencedColumnName;
+		this.parentColumnName = parentColumnName;
 	}
 
 	private void createTable() {
@@ -53,7 +59,8 @@ public class TablePane extends JPanel implements ActionListener,
 		tableModel.addTableModelListener(this);
 		table = new JTable(tableModel);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		// table.
+		table.setAutoscrolls(true);
+		addListSelectionListener(this);
 		JScrollPane scrollPane = new JScrollPane(table);
 		add(scrollPane);
 	}
@@ -179,9 +186,12 @@ public class TablePane extends JPanel implements ActionListener,
 			}
 			data.addElement(row);
 		}
+		rslt.last();
+		insertrow = rslt.getRow() + 1;
 		data.addElement(new Vector(columns));
 		// System.out.println(data.toString()+columnNames.toString());
 		tableModel.setDataVector(data, columnNames);
+		table.getSelectionModel().setSelectionInterval(0, lastSelectedRow);
 
 	}
 
@@ -189,26 +199,66 @@ public class TablePane extends JPanel implements ActionListener,
 		gui.setState(state);
 	}
 
-	public void setSelectedRow(int ID) throws SQLException {
-		boolean found = false;
+	public void setSelectedRow(Integer ID) throws SQLException {
 		rslt.beforeFirst();
 		while (rslt.next()) {
-			if (rslt.getInt(1) == ID) {
-				found = true;
-				break;
+			if (ID.equals(rslt.getInt(referencedColumnName))) {
+				table.getSelectionModel().setSelectionInterval(0,
+						rslt.getRow() - 1);
 			}
-		}
-		if (found) {
-			// table. (rslt.getRow());
-		} else {
-			// TODO no refernced ID
 		}
 	}
 
-	public void setSelectedID(TablePane refTablePane) throws SQLException {
-		refTablePane.getName();
-		refTablePane.getSelectedRowID();
-		// TODO setSelectedID
+	public void setSelectedRow(TablePane parentTablePane) throws SQLException {
+		try {
+			setSelectedRow(parentTablePane
+					.getSeletedReference(parentColumnName));
+		} catch (SQLException e) {
+			if (e.getErrorCode() == 0) {
+
+				table.getSelectionModel()
+						.setSelectionInterval(0, insertrow - 1);
+			} else
+				throw e;
+		}
+	}
+
+	private Integer getSeletedReference(String parentColumnName)
+			throws SQLException {
+		rslt.absolute(table.getSelectedRow() + 1);
+		return rslt.getInt(parentColumnName);
+	}
+
+	public void setReferencedID(TablePane referencedTable) throws SQLException {
+		updateReference(table.getSelectedRow() + 1,
+				referencedTable.getParentColumnName(),
+				referencedTable.getSelectedRowID());
+	}
+
+	private void updateReference(int row, String parentColumnName,
+			int selectedRowID) throws SQLException {
+		try {
+			rslt.absolute(row);
+			rslt.updateObject(parentColumnName, selectedRowID);
+			rslt.updateRow();
+			state("update x: " + parentColumnName + " ; y: " + row + " to: "
+					+ selectedRowID);
+
+		} catch (SQLException e) {
+			if (e.getErrorCode() == 0) {
+				// row not in set --> insert row
+				rslt.moveToInsertRow();
+				rslt.updateObject(parentColumnName, selectedRowID);
+
+			} else {
+				// System.out.println(e.getErrorCode());
+				// e.printStackTrace();
+				gui.handleSQLException(e);
+			}
+		} finally {
+			// TODO fix stackoverflow
+			// this.rebuildModel();
+		}
 	}
 
 	public int getSelectedRowID() throws SQLException {
@@ -327,7 +377,24 @@ public class TablePane extends JPanel implements ActionListener,
 		}
 	}
 
+	@Override
+	public void valueChanged(ListSelectionEvent event) {
+		this.lastSelectedRow = event.getFirstIndex();
+	}
+
 	public void addListSelectionListener(ListSelectionListener listener) {
 		table.getSelectionModel().addListSelectionListener(listener);
+	}
+
+	public ListSelectionModel getListSelectionModel() {
+		return table.getSelectionModel();
+	}
+
+	public String getReferencedColumnName() {
+		return referencedColumnName;
+	}
+
+	public String getParentColumnName() {
+		return parentColumnName;
 	}
 }
