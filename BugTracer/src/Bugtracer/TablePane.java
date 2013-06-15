@@ -1,6 +1,7 @@
 package Bugtracer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -30,12 +33,21 @@ public class TablePane extends JPanel implements ActionListener,
 	private ResultSet rslt;
 	private ResultSetMetaData rsltMetaData;
 	private final JButton btntest = new JButton("Test");
+	private String referencedColumnName;
 
 	public TablePane(Gui gui, String tableName) {
 		this.gui = gui;
 		setName(tableName);
 		initialize();
 
+	}
+	
+	/**
+	 * @wbp.parser.constructor
+	 */
+	public TablePane(Gui gui, String tableName, String referencedColumnName) {
+		this(gui,tableName);
+		this.referencedColumnName=referencedColumnName;
 	}
 
 	private void createTable() {
@@ -50,6 +62,7 @@ public class TablePane extends JPanel implements ActionListener,
 
 	private void initialize() {
 		setLayout(new BorderLayout(0, 0));
+		setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		createTable();
 
@@ -195,7 +208,7 @@ public class TablePane extends JPanel implements ActionListener,
 	public int getSelectedRowID() throws SQLException {
 		int row = table.getSelectedRow();
 		rslt.absolute(++row);
-		return rslt.getInt(1);
+		return rslt.getInt(referencedColumnName);
 	}
 
 	@Override
