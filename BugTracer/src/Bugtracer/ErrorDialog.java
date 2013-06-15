@@ -39,12 +39,19 @@ public class ErrorDialog extends JDialog implements ActionListener {
 		errorTextPane.setBackground(Color.BLACK);
 		errorTextPane.setForeground(Color.WHITE);
 		getContentPane().add(errorTextPane, BorderLayout.CENTER);
-		errorTextPane.setText(exc.toString());
+		//errorTextPane.setText(exc.toString());
+		errorTextPane.setText(exc.getMessage().substring(pointFirstpartendposition(exc.getMessage())));
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		this.dispose();
+	}
+	
+private int pointFirstpartendposition(String message) {
+		
+		return message.indexOf(".")+1;
+		
 	}
 }

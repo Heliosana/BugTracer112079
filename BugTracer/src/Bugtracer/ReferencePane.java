@@ -40,7 +40,8 @@ public class ReferencePane extends JPanel implements ChangeListener,
 				mainTablePane.reload();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				gui.handleSQLException(e);
 			}
 		}
 	}
@@ -58,7 +59,8 @@ public class ReferencePane extends JPanel implements ChangeListener,
 				state("load sql table from db");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
+				gui.handleSQLException(e);
 			}
 		}
 

@@ -210,9 +210,10 @@ public class TablePane extends JPanel implements ActionListener,
 						reload();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						//e1.printStackTrace();
+						gui.handleSQLException(e1);
 					}
-					state("double PRIMARY KEY");
+					//state("double PRIMARY KEY");
 					gui.handleSQLException(e);
 
 				} else if (e.getErrorCode() == 515) {
@@ -221,34 +222,42 @@ public class TablePane extends JPanel implements ActionListener,
 						reload();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						//e1.printStackTrace();
+						gui.handleSQLException(e1);
 					}
-					state("Null as PRIMARY KEY");
+					//state("Null as PRIMARY KEY");
+					gui.handleSQLException(e);
 				} else {
-					System.out.println(e.getErrorCode());
-					e.printStackTrace();
+//					System.out.println(e.getErrorCode());
+//					e.printStackTrace();
+					gui.handleSQLException(e);
 				}
 			}
 		} else if (event.getActionCommand() == "Reload") {
 			try {
 				reload();
 			} catch (SQLException e) {
-				state("can't reload --> error: " + e.getErrorCode());
+				//state("can't reload --> error: " + e.getErrorCode());
 				// e.printStackTrace();
+				state("can't reload --> error:");
+			 gui.handleSQLException(e);
 			}
 		} else if (event.getActionCommand() == "Delete") {
 			try {
 				delete();
 			} catch (SQLException e) {
-				state("can't delete --> error: " + e.getErrorCode());
+				//state("can't delete --> error: " + e.getErrorCode());
 				// e.printStackTrace();
+				state("can't delete --> error:");
+				 gui.handleSQLException(e);
 			}
 		} else {
 			try {
 				test();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				gui.handleSQLException(e);
 			}
 		}
 	}
@@ -283,11 +292,13 @@ public class TablePane extends JPanel implements ActionListener,
 						rslt.updateObject(column, value);
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						//e1.printStackTrace();
+						gui.handleSQLException(e1);
 					}
 				} else {
-					System.out.println(e.getErrorCode());
-					e.printStackTrace();
+//					System.out.println(e.getErrorCode());
+//					e.printStackTrace();
+					gui.handleSQLException(e);
 				}
 			} finally {
 				// reload();
