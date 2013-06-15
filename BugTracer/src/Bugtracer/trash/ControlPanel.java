@@ -116,7 +116,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 		if (rslt != null) {
 			rslt.close();
 		}
-		rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
+		// rslt = gui.statement.executeQuery("SELECT * FROM " + tableName);
 		rsltMetaData = rslt.getMetaData();
 	}
 

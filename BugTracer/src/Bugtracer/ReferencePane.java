@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.TreeMap;
 
 import javax.swing.JPanel;
@@ -23,6 +24,7 @@ public class ReferencePane extends JPanel implements ChangeListener,
 	private ResultSetMetaData rsltMetaData;
 	private boolean initialLoad = true;
 	private TreeMap<String, TablePane> referenceTable;
+	private Statement statement;
 
 	public ReferencePane(Gui gui, String name) {
 		this.gui = gui;
@@ -41,8 +43,8 @@ public class ReferencePane extends JPanel implements ChangeListener,
 			firstLoad();
 			try {
 				mainTablePane.reload();
-				if (referenceTable!=null) {
-					for (TablePane reference :referenceTable.values()) {
+				if (referenceTable != null) {
+					for (TablePane reference : referenceTable.values()) {
 						reference.reload();
 					}
 				}
@@ -56,38 +58,41 @@ public class ReferencePane extends JPanel implements ChangeListener,
 
 	private void firstLoad() {
 		if (initialLoad) {
-			try {
-				if (rslt != null) {
-					rslt.close();
+			if (gui.connection != null) {
+				try {
+					statement = gui.connection.createStatement();
+					if (rslt != null) {
+						rslt.close();
+					}
+					rslt = statement
+							.executeQuery("SELECT * FROM GETREFERENCES('"
+									+ mainTableName + "')");
+					rsltMetaData = rslt.getMetaData();
+					initialLoad = false;
+					state("load sql reference for " + mainTableName);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					// e.printStackTrace();
+					gui.handleSQLException(e);
 				}
-				rslt = gui.statement
-						.executeQuery("SELECT * FROM GETREFERENCES('"
-								+ mainTableName + "')");
-				rsltMetaData = rslt.getMetaData();
-				initialLoad = false;
-				state("load sql reference for " + mainTableName);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-				gui.handleSQLException(e);
-			}
-			try {
-				;
-				JPanel refencePane = new JPanel(new GridLayout(1, 0));
-				referenceTable = new TreeMap<String, TablePane>();
-				while (rslt.next()) {
+				try {
+					;
+					JPanel refencePane = new JPanel(new GridLayout(1, 0));
+					referenceTable = new TreeMap<String, TablePane>();
+					while (rslt.next()) {
 
-					this.add(refencePane);
-					TablePane referencedTable = new TablePane(gui,
-							rslt.getString(1), rslt.getString(2));
-					refencePane.add(referencedTable);
-					referenceTable.put(rslt.getString(3), referencedTable);
+						this.add(refencePane);
+						TablePane referencedTable = new TablePane(gui,
+								rslt.getString(1), rslt.getString(2));
+						refencePane.add(referencedTable);
+						referenceTable.put(rslt.getString(3), referencedTable);
+					}
+					// }
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					// e.printStackTrace();
+					gui.handleSQLException(e);
 				}
-				// }
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-				gui.handleSQLException(e);
 			}
 		}
 

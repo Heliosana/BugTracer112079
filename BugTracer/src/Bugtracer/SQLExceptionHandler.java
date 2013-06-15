@@ -10,9 +10,7 @@ public class SQLExceptionHandler {
 
 	}
 
-	
-	public void SQLExceptionInterpreter(SQLException exe)
-	{
+	public void SQLExceptionInterpreter(SQLException exe) {
 		switch (exe.getErrorCode()) {
 		case 2627:
 			gui.setState("double PRIMARY KEY");
@@ -21,20 +19,20 @@ public class SQLExceptionHandler {
 		case 515:
 			gui.setState("Null as PRIMARY KEY");
 			break;
-			
+
 		default:
 			new ErrorDialog(exe);
 			break;
 		}
-		//gui.setState(exe.getMessage().substring(pointFirstpartendposition(exe.getMessage())));
-		
-		//exe.printStackTrace();
+		// gui.setState(exe.getMessage().substring(pointFirstpartendposition(exe.getMessage())));
+
+		// exe.printStackTrace();
 	}
-	
-//private int pointFirstpartendposition(String message) {
-//		
-//		return message.indexOf(".")+1;
-//		
-//	}
+
+	// private int pointFirstpartendposition(String message) {
+	//
+	// return message.indexOf(".")+1;
+	//
+	// }
 
 }

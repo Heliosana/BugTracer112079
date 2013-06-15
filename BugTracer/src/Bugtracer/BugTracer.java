@@ -42,11 +42,11 @@ public class BugTracer {
 		// }
 	}
 
-	private Statement connect() {
+	private Connection connect() {
 		return connect(dbURL, dbName, dbUser, dbPwd);
 	}
 
-	public Statement connect(String dbURL, String dbName, String dbUsr,
+	public Connection connect(String dbURL, String dbName, String dbUsr,
 			String dbPwd) throws IllegalArgumentException {
 		// System.out.println(dbURL + dbUsr + dbPwd);
 		try {
@@ -74,7 +74,7 @@ public class BugTracer {
 			System.out.println("can't create statement on connection");
 			e.printStackTrace();
 		}
-		return stmt;
+		return conn;
 	}
 
 	public void disconnect() {

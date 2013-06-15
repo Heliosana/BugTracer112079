@@ -1,7 +1,6 @@
 package Bugtracer;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -10,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -39,15 +38,14 @@ public class TablePane extends JPanel implements ActionListener,
 		this.gui = gui;
 		setName(tableName);
 		initialize();
-
 	}
-	
+
 	/**
 	 * @wbp.parser.constructor
 	 */
 	public TablePane(Gui gui, String tableName, String referencedColumnName) {
-		this(gui,tableName);
-		this.referencedColumnName=referencedColumnName;
+		this(gui, tableName);
+		this.referencedColumnName = referencedColumnName;
 	}
 
 	private void createTable() {
@@ -62,7 +60,8 @@ public class TablePane extends JPanel implements ActionListener,
 
 	private void initialize() {
 		setLayout(new BorderLayout(0, 0));
-		setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "", TitledBorder.LEADING,
+				TitledBorder.TOP, null, null));
 
 		createTable();
 
@@ -108,6 +107,7 @@ public class TablePane extends JPanel implements ActionListener,
 
 	private void test() throws SQLException {
 		// TODO someting testing
+		new ErrorDialog(null);
 	}
 
 	private void insert() throws SQLException {
@@ -148,12 +148,18 @@ public class TablePane extends JPanel implements ActionListener,
 	}
 
 	private void loadSql() throws SQLException {
-		state("load sql table from db");
-		if (rslt != null) {
-			rslt.close();
+		if (gui.connection != null) {
+			Statement statement = gui.connection
+					.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+							ResultSet.CONCUR_UPDATABLE);
+			state("load sql table from db");
+			if (rslt != null) {
+				rslt.close();
+			}
+			rslt = statement.executeQuery("SELECT * FROM " + getName());
+			rsltMetaData = rslt.getMetaData();
+			rslt.beforeFirst();
 		}
-		rslt = gui.statement.executeQuery("SELECT * FROM " + getName());
-		rsltMetaData = rslt.getMetaData();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -223,10 +229,10 @@ public class TablePane extends JPanel implements ActionListener,
 						reload();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
-						//e1.printStackTrace();
+						// e1.printStackTrace();
 						gui.handleSQLException(e1);
 					}
-					//state("double PRIMARY KEY");
+					// state("double PRIMARY KEY");
 					gui.handleSQLException(e);
 
 				} else if (e.getErrorCode() == 515) {
@@ -235,14 +241,14 @@ public class TablePane extends JPanel implements ActionListener,
 						reload();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
-						//e1.printStackTrace();
+						// e1.printStackTrace();
 						gui.handleSQLException(e1);
 					}
-					//state("Null as PRIMARY KEY");
+					// state("Null as PRIMARY KEY");
 					gui.handleSQLException(e);
 				} else {
-//					System.out.println(e.getErrorCode());
-//					e.printStackTrace();
+					// System.out.println(e.getErrorCode());
+					// e.printStackTrace();
 					gui.handleSQLException(e);
 				}
 			}
@@ -250,26 +256,26 @@ public class TablePane extends JPanel implements ActionListener,
 			try {
 				reload();
 			} catch (SQLException e) {
-				//state("can't reload --> error: " + e.getErrorCode());
+				// state("can't reload --> error: " + e.getErrorCode());
 				// e.printStackTrace();
 				state("can't reload --> error:");
-			 gui.handleSQLException(e);
+				gui.handleSQLException(e);
 			}
 		} else if (event.getActionCommand() == "Delete") {
 			try {
 				delete();
 			} catch (SQLException e) {
-				//state("can't delete --> error: " + e.getErrorCode());
+				// state("can't delete --> error: " + e.getErrorCode());
 				// e.printStackTrace();
 				state("can't delete --> error:");
-				 gui.handleSQLException(e);
+				gui.handleSQLException(e);
 			}
 		} else {
 			try {
 				test();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				//e.printStackTrace();
+				// e.printStackTrace();
 				gui.handleSQLException(e);
 			}
 		}
@@ -305,12 +311,12 @@ public class TablePane extends JPanel implements ActionListener,
 						rslt.updateObject(column, value);
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
-						//e1.printStackTrace();
+						// e1.printStackTrace();
 						gui.handleSQLException(e1);
 					}
 				} else {
-//					System.out.println(e.getErrorCode());
-//					e.printStackTrace();
+					// System.out.println(e.getErrorCode());
+					// e.printStackTrace();
 					gui.handleSQLException(e);
 				}
 			} finally {

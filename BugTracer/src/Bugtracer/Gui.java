@@ -8,8 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,9 +30,9 @@ public class Gui implements ActionListener {
 	private JTextField loginnameTextfield;
 	private JPasswordField pwField;
 	private JFrame frame;
+	public Connection connection;
 	public boolean connected = false;
 	private JPanel loginPanel;
-	public Statement statement;
 	private JTextField serverNameTextfield;
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
@@ -43,6 +43,19 @@ public class Gui implements ActionListener {
 	// private ControlPanel controlPanel;
 
 	public Gui(BugTracer bugTracer) {
+		setUI();
+		this.bugTracer = bugTracer;
+		initialize();
+		createTabs();
+		setdisconnected();
+		// tableTPanel.setSelectedIndex(1);
+		// tableTPanel.setSelectedIndex(0);
+		sqlexceptionhandler = new SQLExceptionHandler(this);
+		setState("gui started");
+		frame.setVisible(true);
+	}
+
+	private void setUI() {
 		try {
 			UIManager
 					.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -59,15 +72,6 @@ public class Gui implements ActionListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.bugTracer = bugTracer;
-		initialize();
-		createTabs();
-		setdisconnected();
-		// tableTPanel.setSelectedIndex(1);
-		// tableTPanel.setSelectedIndex(0);
-		sqlexceptionhandler = new SQLExceptionHandler(this);
-		setState("gui started");
-		frame.setVisible(true);
 	}
 
 	// private void addTab(String tabName) {
@@ -209,7 +213,7 @@ public class Gui implements ActionListener {
 	private void login() {
 		logout();
 		try {
-			statement = bugTracer.connect(serverIPTextfield.getText(),
+			connection = bugTracer.connect(serverIPTextfield.getText(),
 					serverNameTextfield.getText(),
 					loginnameTextfield.getText(), pwField.getText());
 			ReferencePane toFire = (ReferencePane) tabbedPanel
