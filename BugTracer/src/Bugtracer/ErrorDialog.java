@@ -6,15 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
-public class ErrorFrame extends JFrame implements ActionListener {
+public class ErrorDialog extends JDialog implements ActionListener {
 
-	ErrorFrame(Exception exc) {
+	ErrorDialog(Exception exc) {
 		// exc.printStackTrace();
 		getContentPane().setBackground(Color.RED);
 		setTitle("Error");

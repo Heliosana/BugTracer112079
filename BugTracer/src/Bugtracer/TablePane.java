@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -16,6 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+<<<<<<< HEAD
+=======
+import javax.swing.event.ChangeEvent;
+>>>>>>> try to sync
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -38,15 +44,20 @@ public class TablePane extends JPanel implements ActionListener,
 
 	}
 
-	private void initialize() {
-		setLayout(new BorderLayout(0, 0));
-
+	private void createTable() {
 		tableModel = new DefaultTableModel();
 		tableModel.addTableModelListener(this);
 		table = new JTable(tableModel);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.
 		JScrollPane scrollPane = new JScrollPane(table);
-		add(scrollPane);
+		add(scrollPane);		
+	}
+
+	private void initialize() {
+		setLayout(new BorderLayout(0, 0));
+		
+		createTable();
 
 		JPanel controlPanel = new JPanel();
 		add(controlPanel, BorderLayout.EAST);
@@ -184,7 +195,7 @@ public class TablePane extends JPanel implements ActionListener,
 	public void setSelectedID(TablePane refTablePane) throws SQLException {
 		refTablePane.getName();
 		refTablePane.getSelectedRowID();
-		// TODO
+		// TODO setSelectedID
 	}
 
 	public int getSelectedRowID() throws SQLException {
@@ -295,4 +306,8 @@ public class TablePane extends JPanel implements ActionListener,
 	public void addListSelectionListener(ListSelectionListener listener) {
 		table.getSelectionModel().addListSelectionListener(listener);
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> try to sync
 }

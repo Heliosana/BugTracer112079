@@ -19,6 +19,9 @@ import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 
@@ -35,12 +38,31 @@ public class Gui implements ActionListener {
 	private JTextField serverIPTextfield;
 	private JLabel statepane;
 	private JTabbedPane tabbedPanel;
+<<<<<<< HEAD
 	SQLExceptionHandler sqlexceptionhandler;
+=======
+>>>>>>> try to sync
 
 	// private JTable[] tables = new JTable[20];
 	// private ControlPanel controlPanel;
 
 	public Gui(BugTracer bugTracer) {
+		try {
+			UIManager
+					.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.bugTracer = bugTracer;
 		initialize();
 		createTabs();
@@ -88,10 +110,16 @@ public class Gui implements ActionListener {
 		frame.setBounds(0, 0, 1005, 710);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
+<<<<<<< HEAD
 		gridBagLayout.columnWidths = new int[] { 20, 1101, 20, 0 };
 		gridBagLayout.rowHeights = new int[] { 30, 737, 20, 0 };
 		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
+=======
+		gridBagLayout.columnWidths = new int[] { 1101, 0 };
+		gridBagLayout.rowHeights = new int[] { 30, 737, 20, 0 };
+		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+>>>>>>> try to sync
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 0.0,
 				Double.MIN_VALUE };
 		frame.getContentPane().setLayout(gridBagLayout);
@@ -99,7 +127,6 @@ public class Gui implements ActionListener {
 		loginPanel = new JPanel();
 		loginPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GridBagConstraints gbc_loginPanel = new GridBagConstraints();
-		gbc_loginPanel.gridwidth = 3;
 		gbc_loginPanel.anchor = GridBagConstraints.NORTH;
 		gbc_loginPanel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_loginPanel.insets = new Insets(0, 0, 5, 0);
@@ -152,12 +179,13 @@ public class Gui implements ActionListener {
 		loginPanel.add(btnLogout);
 
 		tabbedPanel = new JTabbedPane(SwingConstants.TOP);
+		tabbedPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		// tableTPanel.addChangeListener(this);
 
 		GridBagConstraints gbc_tableTabbedPanel = new GridBagConstraints();
 		gbc_tableTabbedPanel.fill = GridBagConstraints.BOTH;
-		gbc_tableTabbedPanel.insets = new Insets(0, 0, 5, 5);
-		gbc_tableTabbedPanel.gridx = 1;
+		gbc_tableTabbedPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_tableTabbedPanel.gridx = 0;
 		gbc_tableTabbedPanel.gridy = 1;
 		frame.getContentPane().add(tabbedPanel, gbc_tableTabbedPanel);
 
@@ -182,9 +210,8 @@ public class Gui implements ActionListener {
 		statepane.setBackground(Color.black);
 		statepane.setForeground(Color.BLACK);
 		GridBagConstraints gbc_statepane = new GridBagConstraints();
-		gbc_statepane.insets = new Insets(0, 0, 0, 5);
 		gbc_statepane.anchor = GridBagConstraints.SOUTHEAST;
-		gbc_statepane.gridx = 1;
+		gbc_statepane.gridx = 0;
 		gbc_statepane.gridy = 2;
 		frame.getContentPane().add(statepane, gbc_statepane);
 	}
@@ -200,7 +227,7 @@ public class Gui implements ActionListener {
 					.getSelectedComponent();
 			toFire.stateChanged(new ChangeEvent(tabbedPanel));
 		} catch (IllegalArgumentException e) {
-			new ErrorFrame(e);
+			new ErrorDialog(e);
 		}
 
 	}
@@ -239,9 +266,12 @@ public class Gui implements ActionListener {
 		tabbedPanel.addChangeListener(referencePane);
 	}
 
+<<<<<<< HEAD
 	public void handleSQLException(SQLException exe){
 		sqlexceptionhandler.SQLExceptionInterpreter(exe);
 	}
 	
 	
+=======
+>>>>>>> try to sync
 }
