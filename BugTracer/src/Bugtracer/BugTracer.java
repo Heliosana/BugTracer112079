@@ -34,8 +34,9 @@ public class BugTracer {
 
 	public BugTracer() {
 		gui = new Gui(this);
+		if (gui.debug) {
 		gui.login();
-
+		}
 		// if (connect() != null) {
 		// disconnect();
 		// gui.setState("connection avaiable");

@@ -77,12 +77,12 @@ public class Gui implements ActionListener {
 
 		addTab("UserData");
 		addTab("Adresse");
+		addTab("Dev");
+		addTab("Tester");
 		addTab("Projekt");
 		addTab("Release");
 		addTab("Bug");
 		addTab("Ticket");
-		addTab("Dev");
-		addTab("Tester");
 	}
 
 	private void initialize() {
@@ -175,7 +175,7 @@ public class Gui implements ActionListener {
 	}
 
 	@SuppressWarnings("deprecation")
-	void login() {
+	public void login() {
 		logout();
 		try {
 			connection = bugTracer.connect(serverIPTextfield.getText(),
