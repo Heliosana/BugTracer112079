@@ -1,8 +1,6 @@
 package Bugtracer;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,7 +23,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 public class TablePane extends JPanel implements ActionListener,
 		TableModelListener, ListSelectionListener {
@@ -40,12 +37,13 @@ public class TablePane extends JPanel implements ActionListener,
 	private int lastSelectedRow;
 	private int insertrow;
 	private TableColumnRenderer tableCellRenderer;
+	private boolean initialLoad = true;
 
 	public TablePane(Gui gui, String tableName) {
+		this.tableCellRenderer = new TableColumnRenderer();
 		this.gui = gui;
 		setName(tableName);
 		initialize();
-		tableCellRenderer=new TableColumnRenderer();
 	}
 
 	/**
@@ -63,7 +61,7 @@ public class TablePane extends JPanel implements ActionListener,
 		tableModel.addTableModelListener(this);
 		table = new JTable(tableModel);
 		table.setName(getName());
-		table.setDefaultRenderer(tableCellRenderer.getClass(), tableCellRenderer);
+		table.setDefaultRenderer(Object.class, tableCellRenderer);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setAutoscrolls(true);
 		addListSelectionListener(this);
@@ -172,6 +170,7 @@ public class TablePane extends JPanel implements ActionListener,
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void rebuildModel() throws SQLException {
 		state("reload model");
+		firstLoad();
 		Vector columnNames = new Vector();
 		Vector data = new Vector();
 		int columns = rsltMetaData.getColumnCount();
@@ -192,6 +191,19 @@ public class TablePane extends JPanel implements ActionListener,
 		// System.out.println(data.toString()+columnNames.toString());
 		tableModel.setDataVector(data, columnNames);
 		table.getSelectionModel().setSelectionInterval(0, lastSelectedRow);
+	}
+
+	private void firstLoad() throws SQLException {
+		if (initialLoad) {
+			if (gui.connection != null) {
+				int columns = rsltMetaData.getColumnCount();
+				for (int i = 1; i <= columns; i++) {
+					this.tableCellRenderer.setColumn(i, rsltMetaData.isAutoIncrement(i),rsltMetaData.isNullable(i));
+				}
+				initialLoad = false;
+			}
+		}
+
 	}
 
 	private void state(String state) {
