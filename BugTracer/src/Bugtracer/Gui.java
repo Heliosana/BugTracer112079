@@ -28,7 +28,7 @@ import Bugtracer.trash.SQLExceptionHandler;
 
 public class Gui implements ActionListener {
 
-	public boolean debug = true;
+	public boolean debug = false;
 
 	private BugTracer bugTracer;
 	private JTextField loginnameTextfield;

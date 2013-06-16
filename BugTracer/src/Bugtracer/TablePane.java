@@ -262,7 +262,7 @@ public class TablePane extends JPanel implements ActionListener,
 				insert();
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 2627) {
-					// PRIMARY KEY-Einschränkung
+					// PRIMARY KEY-Restriction
 					gui.handleSQLException(e);
 					try {
 						reload();
@@ -323,6 +323,7 @@ public class TablePane extends JPanel implements ActionListener,
 				// System.out.println(old + "\t-->\t" + value);
 				if (!value.toString().equals(old.toString())) {
 					// new and old values different
+					// TODO fix readonly primary by reload insert row
 					rslt.updateObject(column, value);
 					rslt.updateRow();
 					state("update x: " + column + " ; y: " + row + " to: "
