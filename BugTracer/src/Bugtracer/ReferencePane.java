@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -26,6 +27,7 @@ public class ReferencePane extends JPanel implements ChangeListener,
 	private ArrayList<TablePane> referenceTable;
 	private Statement statement;
 	private boolean firstloaded = false;
+	private boolean settingRow;
 
 	public ReferencePane(Gui gui, String name) {
 		this.gui = gui;
@@ -126,28 +128,35 @@ public class ReferencePane extends JPanel implements ChangeListener,
 	@Override
 	public void valueChanged(ListSelectionEvent event) {
 		if (gui.connected & firstloaded & !event.getValueIsAdjusting()) {
-			if (event.getSource().equals(mainTablePane.getListSelectionModel())) {
-				for (TablePane reference : referenceTable) {
-					try {
-						reference.setSelectedRow(mainTablePane);
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			} else {
-				for (TablePane reference : referenceTable) {
-					if (reference.getListSelectionModel().equals(
-							event.getSource())) {
+			if (!settingRow) {
+				settingRow = true;
+				if (event.getSource().equals(
+						mainTablePane.getListSelectionModel())) {
+					for (TablePane reference : referenceTable) {
 						try {
-							mainTablePane.setReferencedID(reference);
+							reference.setSelectedRow(mainTablePane);
 						} catch (SQLException e) {
-							if (e.getErrorCode() == 0) {
-								
-							} else {
-								// TODO Auto-generated catch block
-								System.out.println(e.getErrorCode());
-								e.printStackTrace();
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} finally {
+							settingRow = false;
+						}
+					}
+				} else {
+					for (TablePane reference : referenceTable) {
+						if (reference.getListSelectionModel().equals(
+								event.getSource())) {
+							try {
+								mainTablePane.setReferencedID(reference);
+							} catch (SQLException e) {
+								if (e.getErrorCode() == 0) {
+									//no current row selected
+								} else {
+									// TODO Auto-generated catch block
+									// e.printStackTrace();
+								}
+							} finally {
+								settingRow = false;
 							}
 						}
 					}

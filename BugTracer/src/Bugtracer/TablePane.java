@@ -32,7 +32,6 @@ public class TablePane extends JPanel implements ActionListener,
 	private Gui gui;
 	private ResultSet rslt;
 	private ResultSetMetaData rsltMetaData;
-	private final JButton btntest = new JButton("Test");
 	private String referencedColumnName;
 	private String parentColumnName;
 	private int lastSelectedRow;
@@ -58,6 +57,7 @@ public class TablePane extends JPanel implements ActionListener,
 		tableModel = new DefaultTableModel();
 		tableModel.addTableModelListener(this);
 		table = new JTable(tableModel);
+		table.setName(getName());
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setAutoscrolls(true);
 		addListSelectionListener(this);
@@ -76,9 +76,9 @@ public class TablePane extends JPanel implements ActionListener,
 		add(controlPanel, BorderLayout.EAST);
 		GridBagLayout gbl_controlPanel = new GridBagLayout();
 		gbl_controlPanel.columnWidths = new int[] { 50, 0 };
-		gbl_controlPanel.rowHeights = new int[] { 20, 20, 20, 0, 0 };
+		gbl_controlPanel.rowHeights = new int[] { 20, 20, 20, 0 };
 		gbl_controlPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_controlPanel.rowWeights = new double[] { 1.0, 1.0, 1.0, 0.0,
+		gbl_controlPanel.rowWeights = new double[] { 1.0, 1.0, 1.0,
 				Double.MIN_VALUE };
 		controlPanel.setLayout(gbl_controlPanel);
 
@@ -100,16 +100,10 @@ public class TablePane extends JPanel implements ActionListener,
 
 		JButton btnReload = new JButton("Reload");
 		GridBagConstraints gbc_btnReload = new GridBagConstraints();
-		gbc_btnReload.insets = new Insets(0, 0, 5, 0);
 		btnReload.addActionListener(this);
 		gbc_btnReload.gridx = 0;
 		gbc_btnReload.gridy = 2;
 		controlPanel.add(btnReload, gbc_btnReload);
-		GridBagConstraints gbc_btntest = new GridBagConstraints();
-		gbc_btntest.gridx = 0;
-		gbc_btntest.gridy = 3;
-		btntest.addActionListener(this);
-		controlPanel.add(btntest, gbc_btntest);
 	}
 
 	private void test() throws SQLException {
@@ -174,11 +168,11 @@ public class TablePane extends JPanel implements ActionListener,
 		state("reload model");
 		Vector columnNames = new Vector();
 		Vector data = new Vector();
-		rslt.beforeFirst();
 		int columns = rsltMetaData.getColumnCount();
 		for (int i = 1; i <= columns; i++) {
 			columnNames.addElement(rsltMetaData.getColumnName(i));
 		}
+		rslt.beforeFirst();
 		while (rslt.next()) {
 			Vector row = new Vector(columns);
 			for (int i = 1; i <= columns; i++) {
@@ -192,14 +186,13 @@ public class TablePane extends JPanel implements ActionListener,
 		// System.out.println(data.toString()+columnNames.toString());
 		tableModel.setDataVector(data, columnNames);
 		table.getSelectionModel().setSelectionInterval(0, lastSelectedRow);
-
 	}
 
 	private void state(String state) {
 		gui.setState(state);
 	}
 
-	public void setSelectedRow(Integer ID) throws SQLException {
+	private void setSelectedRow(Integer ID) throws SQLException {
 		rslt.beforeFirst();
 		while (rslt.next()) {
 			if (ID.equals(rslt.getInt(referencedColumnName))) {
@@ -237,28 +230,8 @@ public class TablePane extends JPanel implements ActionListener,
 
 	private void updateReference(int row, String parentColumnName,
 			int selectedRowID) throws SQLException {
-		try {
-			rslt.absolute(row);
-			rslt.updateObject(parentColumnName, selectedRowID);
-			rslt.updateRow();
-			state("update x: " + parentColumnName + " ; y: " + row + " to: "
-					+ selectedRowID);
-
-		} catch (SQLException e) {
-			if (e.getErrorCode() == 0) {
-				// row not in set --> insert row
-				rslt.moveToInsertRow();
-				rslt.updateObject(parentColumnName, selectedRowID);
-
-			} else {
-				// System.out.println(e.getErrorCode());
-				// e.printStackTrace();
-				gui.handleSQLException(e);
-			}
-		} finally {
-			// TODO fix stackoverflow
-			// this.rebuildModel();
-		}
+		tableModel.setValueAt(selectedRowID, --row,
+				tableModel.findColumn(parentColumnName));
 	}
 
 	public int getSelectedRowID() throws SQLException {
@@ -274,7 +247,7 @@ public class TablePane extends JPanel implements ActionListener,
 				insert();
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 2627) {
-					// Verletzung der PRIMARY KEY-Einschränkung
+					// PRIMARY KEY-Einschränkung
 					try {
 						reload();
 					} catch (SQLException e1) {
