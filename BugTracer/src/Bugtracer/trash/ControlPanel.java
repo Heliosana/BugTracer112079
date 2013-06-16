@@ -155,8 +155,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 		try {
 			reload();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			gui.handleSQLException(e);
 		}
 	}
 
@@ -189,8 +188,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 						rslt.moveToInsertRow();
 						rslt.updateObject(column, value);
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						gui.handleSQLException(e1);
 					}
 				} else {
 					System.out.println(e.getErrorCode());
@@ -215,8 +213,7 @@ public class ControlPanel extends JPanel implements ActionListener,
 					try {
 						reload();
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						gui.handleSQLException(e1);
 					}
 					state("double PRIMARY KEY");
 				} else if (e.getErrorCode() == 515) {
@@ -224,13 +221,11 @@ public class ControlPanel extends JPanel implements ActionListener,
 					try {
 						reload();
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						gui.handleSQLException(e1);
 					}
 					state("Null as PRIMARY KEY");
 				} else {
-					System.out.println(e.getErrorCode());
-					e.printStackTrace();
+					gui.handleSQLException(e);
 				}
 			}
 		} else if (event.getActionCommand() == "Reload") {
@@ -238,26 +233,21 @@ public class ControlPanel extends JPanel implements ActionListener,
 				reload();
 			} catch (SQLException e) {
 				state("can't reload --> error: " + e.getErrorCode());
-				// e.printStackTrace();
+				gui.handleSQLException(e);
 			}
 		} else if (event.getActionCommand() == "Delete") {
 			try {
 				delete();
 			} catch (SQLException e) {
 				state("can't delete --> error: " + e.getErrorCode());
-				// e.printStackTrace();
+				gui.handleSQLException(e);
 			}
 		} else {
-			test();
+			System.out.println("sollte nicht kommen --< Controlpanel");
 		}
 	}
 
 	private void state(String state) {
 		gui.setState(state);
 	}
-
-	private void test() {
-		// TODO someting testing
-	}
-
 }

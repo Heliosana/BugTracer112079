@@ -5,7 +5,6 @@ package Bugtracer;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -43,38 +42,22 @@ public class BugTracer {
 		// }
 	}
 
-	private Connection connect() {
+	private Connection connect() throws SQLException {
 		return connect(dbURL, dbName, dbUser, dbPwd);
 	}
 
 	public Connection connect(String dbURL, String dbName, String dbUsr,
-			String dbPwd) throws IllegalArgumentException {
+			String dbPwd) throws SQLException {
 		// System.out.println(dbURL + dbUsr + dbPwd);
 		try {
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
-		} catch (ClassNotFoundException ce) {
-			// TODO Auto-generated catch block
-
-			ce.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			gui.setState("no sql driver loaded");
 		}
-		try {
-			conn = DriverManager.getConnection("jdbc:jtds:sqlserver://" + dbURL
-					+ "/" + dbName, dbUsr, dbPwd);
-		} catch (SQLException e) {
-			gui.setState("failed to connect");
-			throw new IllegalArgumentException(
-					"\ncouldn't establish connection\n --> check you logon values:\ndbUrl: "
-							+ dbURL + "\ndbName: " + dbName + "\ndbUsername: "
-							+ dbUsr + "\ndbPassword: " + dbPwd, e);
-		}
-		try {
-			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-					ResultSet.CONCUR_UPDATABLE);
-			gui.setconnected();
-		} catch (SQLException e) {
-			System.out.println("can't create statement on connection");
-			e.printStackTrace();
-		}
+		conn = DriverManager.getConnection("jdbc:jtds:sqlserver://" + dbURL
+				+ "/" + dbName, dbUsr, dbPwd);
+		gui.setState("connected");
+		gui.setconnected();
 		return conn;
 	}
 
@@ -88,8 +71,7 @@ public class BugTracer {
 			}
 			gui.setdisconnected();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			gui.handleSQLException(e);
 		}
 	}
 }

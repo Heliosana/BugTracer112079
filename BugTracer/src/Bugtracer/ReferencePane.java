@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -53,8 +52,6 @@ public class ReferencePane extends JPanel implements ChangeListener,
 					firstloaded = true;
 				}
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
 				gui.handleSQLException(e);
 			}
 		}
@@ -75,8 +72,6 @@ public class ReferencePane extends JPanel implements ChangeListener,
 					initialLoad = false;
 					state("load sql reference for " + mainTableName);
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					// e.printStackTrace();
 					gui.handleSQLException(e);
 				}
 				try {
@@ -94,8 +89,6 @@ public class ReferencePane extends JPanel implements ChangeListener,
 					}
 					// }
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					// e.printStackTrace();
 					gui.handleSQLException(e);
 				}
 			}
@@ -136,8 +129,7 @@ public class ReferencePane extends JPanel implements ChangeListener,
 						try {
 							reference.setSelectedRow(mainTablePane);
 						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							gui.handleSQLException(e);
 						} finally {
 							settingRow = false;
 						}
@@ -150,10 +142,9 @@ public class ReferencePane extends JPanel implements ChangeListener,
 								mainTablePane.setReferencedID(reference);
 							} catch (SQLException e) {
 								if (e.getErrorCode() == 0) {
-									//no current row selected
+									// no current row selected
 								} else {
-									// TODO Auto-generated catch block
-									// e.printStackTrace();
+									gui.handleSQLException(e);
 								}
 							} finally {
 								settingRow = false;

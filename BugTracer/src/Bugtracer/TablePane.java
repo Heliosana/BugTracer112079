@@ -110,11 +110,6 @@ public class TablePane extends JPanel implements ActionListener,
 		controlPanel.add(btnReload, gbc_btnReload);
 	}
 
-	private void test() throws SQLException {
-		// TODO someting testing
-		new ErrorDialog(null);
-	}
-
 	private void insert() throws SQLException {
 		if (gui.connected) {
 			rslt.moveToInsertRow();
@@ -198,7 +193,9 @@ public class TablePane extends JPanel implements ActionListener,
 			if (gui.connection != null) {
 				int columns = rsltMetaData.getColumnCount();
 				for (int i = 1; i <= columns; i++) {
-					this.tableCellRenderer.setColumn(i, rsltMetaData.isAutoIncrement(i),rsltMetaData.isNullable(i));
+					this.tableCellRenderer.setColumn(i,
+							rsltMetaData.isAutoIncrement(i),
+							rsltMetaData.isNullable(i));
 				}
 				initialLoad = false;
 			}
@@ -266,11 +263,10 @@ public class TablePane extends JPanel implements ActionListener,
 			} catch (SQLException e) {
 				if (e.getErrorCode() == 2627) {
 					// PRIMARY KEY-Einschränkung
+					gui.handleSQLException(e);
 					try {
 						reload();
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						// e1.printStackTrace();
 						gui.handleSQLException(e1);
 					}
 					// state("double PRIMARY KEY");
@@ -281,15 +277,11 @@ public class TablePane extends JPanel implements ActionListener,
 					try {
 						reload();
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						// e1.printStackTrace();
 						gui.handleSQLException(e1);
 					}
 					// state("Null as PRIMARY KEY");
 					gui.handleSQLException(e);
 				} else {
-					// System.out.println(e.getErrorCode());
-					// e.printStackTrace();
 					gui.handleSQLException(e);
 				}
 			}
@@ -298,7 +290,6 @@ public class TablePane extends JPanel implements ActionListener,
 				reload();
 			} catch (SQLException e) {
 				// state("can't reload --> error: " + e.getErrorCode());
-				// e.printStackTrace();
 				state("can't reload --> error:");
 				gui.handleSQLException(e);
 			}
@@ -307,18 +298,11 @@ public class TablePane extends JPanel implements ActionListener,
 				delete();
 			} catch (SQLException e) {
 				// state("can't delete --> error: " + e.getErrorCode());
-				// e.printStackTrace();
 				state("can't delete --> error:");
 				gui.handleSQLException(e);
 			}
 		} else {
-			try {
-				test();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-				gui.handleSQLException(e);
-			}
+			// LANGEWEILE..
 		}
 	}
 
@@ -351,13 +335,9 @@ public class TablePane extends JPanel implements ActionListener,
 						rslt.moveToInsertRow();
 						rslt.updateObject(column, value);
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						// e1.printStackTrace();
 						gui.handleSQLException(e1);
 					}
 				} else {
-					// System.out.println(e.getErrorCode());
-					// e.printStackTrace();
 					gui.handleSQLException(e);
 				}
 			} finally {

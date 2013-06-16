@@ -2,7 +2,6 @@ package Bugtracer;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.sql.ResultSetMetaData;
 import java.util.TreeMap;
 

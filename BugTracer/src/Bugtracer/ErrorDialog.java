@@ -4,24 +4,42 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
 public class ErrorDialog extends JDialog implements ActionListener {
 
-	ErrorDialog(Exception exc) {
+	private JTextPane errorTextPane;
+	private Gui gui;
 
+	public ErrorDialog(SQLException e, Gui gui) {
+		this.gui = gui;
 		getContentPane().setBackground(Color.RED);
 		setTitle("Error");
-		this.setBounds(0, 0, 328, 273);
+		this.setBounds(0, 0, 500, 200);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		initialize();
+		handleException(e);
+		this.setModal(true);
 		this.setVisible(true);
+	}
 
+	private void handleException(SQLException e) {
+		if (gui.debug) {
+			System.out.println(e.getErrorCode());
+			e.printStackTrace();
+		}
+		errorTextPane.setText("ErrorCode: " + e.getErrorCode() + "\n"
+				+ e.getMessage());
+	}
+
+	private void initialize() {
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.RED);
 		getContentPane().add(panel, BorderLayout.SOUTH);
@@ -34,14 +52,11 @@ public class ErrorDialog extends JDialog implements ActionListener {
 		lblHead.setHorizontalAlignment(SwingConstants.CENTER);
 		getContentPane().add(lblHead, BorderLayout.NORTH);
 
-		JTextArea errorTextPane = new JTextArea();
+		errorTextPane = new JTextPane();
 		errorTextPane.setEditable(false);
-		errorTextPane.setBackground(Color.DARK_GRAY);
-		errorTextPane.setForeground(Color.WHITE);
+		errorTextPane.setBackground(Color.WHITE);
+		errorTextPane.setForeground(Color.BLACK);
 		getContentPane().add(errorTextPane, BorderLayout.CENTER);
-		errorTextPane.setText(exc.getMessage().substring(
-				pointFirstpartendposition(exc.getMessage())));
-		exc.printStackTrace();
 	}
 
 	@Override
@@ -49,9 +64,4 @@ public class ErrorDialog extends JDialog implements ActionListener {
 		this.dispose();
 	}
 
-	private int pointFirstpartendposition(String message) {
-
-		return message.indexOf(".") + 1;
-
-	}
 }

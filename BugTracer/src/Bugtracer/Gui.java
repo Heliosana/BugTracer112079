@@ -24,12 +24,16 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 
+import Bugtracer.trash.SQLExceptionHandler;
+
 public class Gui implements ActionListener {
+
+	public boolean debug = true;
 
 	private BugTracer bugTracer;
 	private JTextField loginnameTextfield;
 	private JPasswordField pwField;
-	private JFrame frame;
+	public JFrame frame;
 	public Connection connection;
 	public boolean connected = false;
 	private JPanel loginPanel;
@@ -39,17 +43,12 @@ public class Gui implements ActionListener {
 	private JTabbedPane tabbedPanel;
 	private SQLExceptionHandler sqlexceptionhandler;
 
-	// private JTable[] tables = new JTable[20];
-	// private ControlPanel controlPanel;
-
 	public Gui(BugTracer bugTracer) {
 		setUI();
 		this.bugTracer = bugTracer;
 		initialize();
 		createTabs();
 		setdisconnected();
-		// tableTPanel.setSelectedIndex(1);
-		// tableTPanel.setSelectedIndex(0);
 		sqlexceptionhandler = new SQLExceptionHandler(this);
 		setState("gui started");
 		frame.setVisible(true);
@@ -60,29 +59,15 @@ public class Gui implements ActionListener {
 			UIManager
 					.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
-	// private void addTab(String tabName) {
-	// DefaultTableModel model = new DefaultTableModel();
-	// JTable table = new JTable(model);
-	// table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-	// JScrollPane sPane = new JScrollPane(table);
-	// sPane.setName(tabName);
-	// tableTPanel.addTab(tabName, null, sPane, null);
-	// tables[tableTPanel.getTabCount() - 1] = table;
-	// }
 
 	private void addTab(String name) {
 		tabbedPanel.addTab(name, null, new ReferencePane(this, name), null);
@@ -98,9 +83,6 @@ public class Gui implements ActionListener {
 		addTab("Ticket");
 		addTab("Dev");
 		addTab("Tester");
-		// addTab("Developer");
-		// addTab("BugTester");
-		// addTab("AllUser");
 	}
 
 	private void initialize() {
@@ -172,7 +154,6 @@ public class Gui implements ActionListener {
 
 		tabbedPanel = new JTabbedPane(SwingConstants.TOP);
 		tabbedPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		// tableTPanel.addChangeListener(this);
 
 		GridBagConstraints gbc_tableTabbedPanel = new GridBagConstraints();
 		gbc_tableTabbedPanel.fill = GridBagConstraints.BOTH;
@@ -180,21 +161,6 @@ public class Gui implements ActionListener {
 		gbc_tableTabbedPanel.gridx = 0;
 		gbc_tableTabbedPanel.gridy = 1;
 		frame.getContentPane().add(tabbedPanel, gbc_tableTabbedPanel);
-
-		// controlPanel = new ControlPanel(this);
-		// GridBagLayout gridBagLayout_1 = (GridBagLayout)
-		// controlPanel.getLayout();
-		// gridBagLayout_1.columnWidths = new int[] { 100 };
-		// gridBagLayout_1.rowHeights = new int[] { 50, 50, 50, 50, 50 };
-		// controlPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		// GridBagConstraints gbc_controlPanel = new GridBagConstraints();
-		// gbc_controlPanel.fill = GridBagConstraints.VERTICAL;
-		// gbc_controlPanel.anchor = GridBagConstraints.NORTH;
-		// gbc_controlPanel.insets = new Insets(0, 0, 5, 0);
-		// gbc_controlPanel.gridx = 1;
-		// gbc_controlPanel.gridy = 1;
-		// frame.getContentPane().add(controlPanel, gbc_controlPanel);
-		// controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 
 		statepane = new JLabel();
 		statepane.setHorizontalAlignment(SwingConstants.CENTER);
@@ -215,13 +181,12 @@ public class Gui implements ActionListener {
 			connection = bugTracer.connect(serverIPTextfield.getText(),
 					serverNameTextfield.getText(),
 					loginnameTextfield.getText(), pwField.getText());
-			ReferencePane toFire = (ReferencePane) tabbedPanel
-					.getSelectedComponent();
-			toFire.stateChanged(new ChangeEvent(tabbedPanel));
-		} catch (IllegalArgumentException e) {
-			new ErrorDialog(e);
+		} catch (SQLException e) {
+			handleSQLException(e);
 		}
-
+		ReferencePane toFire = (ReferencePane) tabbedPanel
+				.getSelectedComponent();
+		toFire.stateChanged(new ChangeEvent(tabbedPanel));
 	}
 
 	private void logout() {
@@ -257,7 +222,7 @@ public class Gui implements ActionListener {
 		tabbedPanel.addChangeListener(referencePane);
 	}
 
-	public void handleSQLException(SQLException exe) {
-		sqlexceptionhandler.SQLExceptionInterpreter(exe);
+	public void handleSQLException(SQLException e) {
+		new ErrorDialog(e, this);
 	}
 }
