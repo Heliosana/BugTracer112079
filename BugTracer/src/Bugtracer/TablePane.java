@@ -1,6 +1,8 @@
 package Bugtracer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -23,6 +25,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 public class TablePane extends JPanel implements ActionListener,
 		TableModelListener, ListSelectionListener {
@@ -36,11 +39,13 @@ public class TablePane extends JPanel implements ActionListener,
 	private String parentColumnName;
 	private int lastSelectedRow;
 	private int insertrow;
+	private TableColumnRenderer tableCellRenderer;
 
 	public TablePane(Gui gui, String tableName) {
 		this.gui = gui;
 		setName(tableName);
 		initialize();
+		tableCellRenderer=new TableColumnRenderer();
 	}
 
 	/**
@@ -58,6 +63,7 @@ public class TablePane extends JPanel implements ActionListener,
 		tableModel.addTableModelListener(this);
 		table = new JTable(tableModel);
 		table.setName(getName());
+		table.setDefaultRenderer(tableCellRenderer.getClass(), tableCellRenderer);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setAutoscrolls(true);
 		addListSelectionListener(this);
